@@ -22,13 +22,58 @@ h1 {
     font-size: 4em;
     line-height: 0.6;
 }
-h6 {
-}
+
 
 html{
     scrollbar-width: thin; /* Firefox için kaydırma çubuğu genişliği */
     scrollbar-color: #454545 #2e2e2e; /* Kaydırma çubuğu ve arka plan rengi */
     background-color: #f5f5f500;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center; justify-content: center;
+}
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-buttons #confirmAdd{
+    background-color: rgb(37, 155, 16);
+    border: 0;
+}
+.modal-buttons #confirmAdd:hover{
+    background-color: rgb(47, 218, 17);
+}
+.modal-buttons input{
+    padding: 5px 15px;
+    margin: 10px 2px 0px 2px;
+    border-radius: 15px;
+    width: 50%;
+    transition: background-color 0.2s, border 0.1s;
+}
+
+.modal-buttons button{
+    margin: 10px 2px 0px 2px;
+    border-radius: 100px;
+    width: min-content;
+    transition: background-color 0.2s, border 0.1s;
+}
+
+.modal-buttons button:hover{
+    background-color: #ff0000;
+}
+
+.modal-content {
+    background: rgb(57, 57, 57);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
 }
 
 #RealBody{
@@ -97,6 +142,15 @@ html {height: auto; width: auto;}
 }
 .kitap .buttonDiv button{
     margin: 0px 2px 0px 2px;
+}
+.kitap .buttonDiv .fitB p{
+    margin: 0;
+}
+.kitap .buttonDiv #sil{
+    background-color: rgb(179, 33, 7);
+}
+.kitap .buttonDiv #ekle{
+    background-color: rgb(37, 155, 16);
 }
 
 
@@ -229,6 +283,24 @@ button:active{
 }
 
 
+@media (max-width: 768px) {
+    .kitap .buttonDiv .fitB{
+        width: fit-content;
+    }
+    .kitap .buttonDiv .fitB p{
+        width: max-content;
+    }
+}
+
+@media (max-width: 576px) {
+    .kitap img {
+        width: 80px; 
+        height: 120px; 
+    }
+    h1 {
+        font-size: 2.5em;
+    }
+}
 @media (prefers-color-scheme: dark) {
     body{
         background-color: #292929;

@@ -1,5 +1,20 @@
 // localStorage.removeItem('kitaplar');
 
+function SayfaEkleme(callback) {
+    let modal = document.getElementById("deleteModal");
+    modal.style.display = "flex";
+
+    document.getElementById("confirmAdd").onclick = function () {
+        callback(true,modal);
+    };
+    document.getElementById("cancelAdd").onclick = function () {
+        callback(false,modal);
+    };
+}
+
+    // Kullanım:
+    /* */
+
 // Rastgele sayı üretme fonksiyonu
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -23,6 +38,8 @@ function kitapAra() {
     fetch(`https://www.googleapis.com/books/v1/volumes?q=${aramaTuru}:${kitapAdi}`)
         .then(response => response.json())
         .then(data => {
+            document.getElementById('kitapSecenekleriDiv').innerHTML = 
+            '<div id="kitapSecenekleri" class="container"></div>';
             const seceneklerDiv = document.getElementById('kitapSecenekleri');
             seceneklerDiv.innerHTML = '';
 
@@ -53,8 +70,8 @@ function kitapAra() {
 }
 
 function kitapEkle(kitapBilgisi) {
-    const seceneklerDiv = document.getElementById('kitapSecenekleri');
-    seceneklerDiv.innerHTML = '';
+    
+    document.getElementById('kitapSecenekleriDiv').innerHTML = '<div id="kitapSecenekleri" class="container"></div>';
 
     let yeniKitap = {
         isim: kitapBilgisi.title,
@@ -112,7 +129,8 @@ function kitaplariGoster(newIndex) {
                             <p><i class="fas fa-calendar-alt"></i> Başlangıç: ${kitap.baslangicTarihi}</p>
                             <div class='buttonDiv'>
                                 <button onclick="bookChange(${index});"><i class="fas fa-pencil-alt"></i> Düzenle</button>
-                                <button onclick="bookChange(${index});"><i class="fas fa-pencil-alt"></i> ekle</button>
+                                <button id='ekle' class='fitB' onclick="bookAdd(${index});"><p><i class="fa-solid fa-plus"></i> ekle</p></button>
+                                <button id='sil' class='fitB' onclick="bookDelete(${index});"><p><i class="fa-solid fa-trash-can"></i> Sil</p></button>
                             </div>
                         </div>
                     </div>
@@ -129,6 +147,52 @@ function kitaplariGoster(newIndex) {
 
 function bookChange(index){
     kitaplariGoster(index);
+}
+
+function bookAdd(index){
+    let kitap = kitaplar[index];
+    
+    SayfaEkleme(function(confirmed, modal) {
+        if (confirmed) {
+            let yeniSayfa = Number(document.getElementById('okunanSayfa').value);
+            if (yeniSayfa + kitap.okunanSayfa > kitap.sayfaSayisi) {
+                console.log("Okuduğun sayfa sayısı toplam sayfadan büyük olamaz.");
+                Swal.fire("Hata!", "Okuduğun sayfa sayısı toplam sayfadan büyük olamaz.", "error");
+                return;
+            }
+            if (yeniSayfa <= 0) {
+                console.log("Okuduğun sayfa sayısı 0'dan küçük olamaz.");
+                Swal.fire("Hata!", "Okuduğun sayfa sayısı 0'dan küçük olamaz.", "error");
+                return;
+            }
+
+            modal.style.display = "none";
+            sayfaGuncelle(index, yeniSayfa + kitap.okunanSayfa);
+        } else {
+            modal.style.display = "none";
+            console.log("İşlem iptal edildi!");
+        }
+    });
+}
+
+function bookDelete(index){
+    Swal.fire({
+        title: "Kitap silmek istediğinize emin misiniz?",
+        text: "Bu kitabı silmek istediğinize emin misiniz? Geri alınamaz!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sil",
+        cancelButtonText: "İptal",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            kitaplar.splice(index, 1);
+            localStorage.setItem('kitaplar', JSON.stringify(kitaplar));
+            kitaplariGoster(index);
+            Swal.fire("Silindi!", "Kitap başarıyla silindi.", "success");
+        }
+    });
 }
 
 function saveBook(index,book) {
