@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KiHeb - Kitap Takip</title>
+    <link rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -18,11 +20,21 @@
             <p>Kaç sayfa okudunuz? Kaç sayfa eklemek istersiniz?</p>
             <div class="modal-buttons">
                 <input type="number" id="okunanSayfa" placeholder="Okunan Sayfa Sayısı">
-                <button id="confirmAdd" class="btn btn-danger"><i class="fa-solid fa-plus"></i></button>
+                <button id="confirmAdd" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
                 <button id="cancelAdd" class="btn btn-danger">İptal</button>
             </div>
         </div>
     </div>
+
+        <!-- NOT -->
+        <div id="NotModal" class="modal ">
+            <div class="modal-content container">
+                <!--x butonu yap--->
+                <button id="cancelAddNot" class="closeNot btn btn-danger"><i class="fa-solid fa-xmark"></i></button>
+                
+                <textarea id="notArea" class='notArea' rows="1" cols="10" placeholder='NOT' value="{{kitapNot}}"></textarea>
+            </div>
+        </div>
 
     <div id="RealBody">
         <header>
@@ -33,19 +45,88 @@
         <div id="aramaDiv">
             <button id="aramaTuruButton">Kitap İsmi</button>
             <input type="text" id="kitapAdi" placeholder="Aradığınız kitabı girin...">
-            <button onclick="kitapAra()">Ara</button>
+            <button onclick="kitapAra()"><i class="fa fa-search"></i></button>
         </div>
-        
         <p>Kitap veya yazar ismini ara ve ekle.</p>
+        
         <br>
         <div id="kitapSecenekleriDiv">
             <div id="kitapSecenekleri" class="container"></div>
         </div>
     
+        <div id="gridButtons" class="container" style="
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 20px;">
+            <button onclick="smallGrid(this)" id="smallGrid" class="btn btn-secondary"><i class="fa-solid fa-grip"></i></button>
+            <button onclick="bigGrid(this)" id="bigGrid" class="btn btn-secondary ms-2"><i class="fa-solid fa-grip-lines"></i></button>
+        </div>
+        
+        <div class="controls">
+            <label for="sortSelect">Sırala:</label>
+            <select id="sortSelect">
+                <option value="baslangicTarihi+">Başlangıç Tarihi (Yeni → Eski)</option>
+                <option value="baslangicTarihi-">Başlangıç Tarihi (Eski → Yeni)</option>
+                <option value="okunanSayfa">Okunan Sayfa (Az → Çok)</option>
+                <option value="okunanSayfa-">Okunan Sayfa (Çok → Az)</option>
+                <option value="kitapIsim+">Kitap İsmi (A → Z)</option>
+                <option value="kitapIsim-">Kitap İsmi (Z → A)</option>
+                <option value="kitapSayfaSayisi+">Sayfa Sayısı (Az → Çok)</option>
+                <option value="kitapSayfaSayisi-">Sayfa Sayısı (Çok → Az)</option>
+
+            </select>
+        </div>
+
         <div id="kitapListesi" class="container"></div>
     </div>
+
+
+    <div id="kitapSablon" style="display: none;">
+
+        <div class="kitap">
+            <div class='Ana'>
+                <img src="{{kitapKapak}}" alt="Kitap Kapağı" class="kitapKapak">
+                <div class='kitapBilgisi'>
+                    <div id="headerH3"><h3> {{kitapIsim}} - {{kitapYazar}}</h3></div>
+                    <p><i class="fas fa-file-alt"></i> Sayfa Sayısı: {{kitapOkunanSayfa}} / {{kitapSayfaSayisi}}</p>
+                    <p><i class="fas fa-calendar-alt"></i> Başlangıç: {{kitapBaslangicTarihi}}</p>
+                    <div class='buttonDiv'>
+                        <button class="btn btn-primary " onclick="bookChange({kitapIndex});"><i class="fas fa-pencil-alt"></i> <span>Düzenle</span></button>
+                        <button class='fitB btn btn-success' onclick="bookAdd({kitapIndex});"><i class="fa-solid fa-plus"></i> <span>ekle</span></button>
+                        <button class='fitB btn btn-danger' onclick="bookDelete({kitapIndex});"><i class="fa-solid fa-trash-can"></i> <span>Sil</span></button>
+                        <button class='fitBB btn btn-warning' onclick="NotEkleme1({kitapIndex});"><i class="fa-solid fa-note-sticky"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class='yuzdelik' style="width: 2030303030;"></div>
+        </div>
+        
+    </div>
+
+    <div id="kitapDüzenSablon" style="display: none;">
+
+        
+    <div class="kitap">
+        <div class='Ana'>
+            <img src="{{kitapKapak}}" alt="Kitap Kapağı" class="kitapKapak">
+            <div class='kitapBilgisi'>
+                <p><i class="fas fa-book"></i> Kitap İsmi: <input class='name kitapIsim' value='{{kitapIsim}}'></p>
+                <p><i class="fa-regular fa-user"></i> Yazar: <input class='name kitapYazar' value='{{kitapYazar}}'></p>
+                <p><i class="fas fa-file-alt"></i> Sayfa Sayısı: <input type="number" class='sayfa kitapOkunanSayfa' value='{{kitapOkunanSayfa}}'> / <input type="number" class='sayfa kitapSayfaSayisi' value='{{kitapSayfaSayisi}}'>
+                <p><i class="fas fa-calendar-alt"></i> Başlangıç: <input type="date" class="kitapBaslangicTarihi" value='{{kitapBaslangicTarihi}}'></p>
+                <button class="btn btn-primary " onclick="saveBook({kitapIndex}, this)"><i class="fas fa-pencil-alt"></i> Kaydet</button>
+                <p id='hataMesaj' style='color: red;'></p>
+            </div>
+        </div>
+        <div class='yuzdelik' style="width: 2030303030;"></div>
+    </div>
+
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
     
     <script src="assets/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

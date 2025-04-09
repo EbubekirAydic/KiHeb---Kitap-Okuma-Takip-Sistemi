@@ -1,5 +1,18 @@
 // localStorage.removeItem('kitaplar');
 
+// Şablonlar
+let KitapSablon = document.getElementById("kitapSablon");
+let KitapDüzenSablon = document.getElementById("kitapDüzenSablon");
+
+let SearchParametre = 'baslangicTarihi+';
+
+document.getElementById('sortSelect').addEventListener('change', function() {
+    SearchParametre = this.value;
+    kitaplariGoster();
+});
+
+
+
 function SayfaEkleme(callback) {
     let modal = document.getElementById("deleteModal");
     modal.style.display = "flex";
@@ -12,8 +25,32 @@ function SayfaEkleme(callback) {
     };
 }
 
-    // Kullanım:
-    /* */
+function NotEkleme(callback) {
+    let modal = document.getElementById("NotModal");
+    modal.style.display = "flex";
+
+    document.getElementById("confirmAdd").onclick = function () {
+        callback(modal);
+    };
+    document.getElementById("cancelAddNot").onclick = function () {
+        callback(modal);
+    };
+}
+
+function NotEkleme1(index) {
+    let kitap = kitaplar[index];
+
+    document.getElementById('notArea').value = kitap.not == undefined ? '' : kitap.not;
+    
+    NotEkleme(function(modal) {
+        modal.style.display = "none";
+
+        let notText = document.getElementById('notArea').value;
+        kitap.not = notText;
+        localStorage.setItem('kitaplar', JSON.stringify(kitaplar));
+        kitaplariGoster();
+    });
+}
 
 // Rastgele sayı üretme fonksiyonu
 function getRndInteger(min, max) {
@@ -74,7 +111,7 @@ function kitapEkle(kitapBilgisi) {
     document.getElementById('kitapSecenekleriDiv').innerHTML = '<div id="kitapSecenekleri" class="container"></div>';
 
     let yeniKitap = {
-        isim: kitapBilgisi.title,
+        isim: kitapBilgisi.title ? kitapBilgisi.title : 'Bilinmiyor',
         sayfaSayisi: kitapBilgisi.pageCount || 'Bilinmiyor',
         yazar: kitapBilgisi.authors ? kitapBilgisi.authors.join(', ') : 'Bilinmiyor',
         kapak: kitapBilgisi.imageLinks ? kitapBilgisi.imageLinks.thumbnail : 'https://via.placeholder.com/100x150',
@@ -82,7 +119,8 @@ function kitapEkle(kitapBilgisi) {
         baslangicTarihi: formatTarih(new Date().toISOString().split('T')[0]),
         bitisTarihi: null,
         okumaGecmisi: [],
-        not: ''
+        not: '',
+        id: kitaplar.length > 0 ? kitaplar.length : 0 // ID'yi otomatik artır
     };
 
     kitaplar.push(yeniKitap);
@@ -94,50 +132,101 @@ function kitaplariGoster(newIndex) {
     const listeDiv = document.getElementById('kitapListesi');
     listeDiv.innerHTML = '';
 
-    kitaplar.forEach((kitap, index) => {
-        if (index == newIndex) {
+    // kitaplar'ın kopyasını al, ona dokunalım
+    let siraliKitaplar = [...kitaplar];
 
+    // Kopyayı tarihe göre sırala (optimize edilmiş)
+    
+    function parseDate(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        if (day && month && year) {
+            return new Date(`${year}-${month}-${day}`);
+        } else {
+            console.warn(`Invalid date format: ${dateStr}`);
+            return new Date(0); // Default to epoch time for invalid dates
+        }
+    };
+
+    siraliKitaplar.sort((a, b) => {
+        const tarihA = parseDate(a.baslangicTarihi);
+        const tarihB = parseDate(b.baslangicTarihi);
+
+        // Subtracting Date objects returns the difference in milliseconds
+        if (SearchParametre == 'baslangicTarihi-') {
+            return tarihA - tarihB;
+
+        } else if (SearchParametre == 'baslangicTarihi+') {
+            return tarihB - tarihA;
+
+
+
+        } else if (SearchParametre == 'okunanSayfa-') {
+            return a.okunanSayfa - b.okunanSayfa;
+
+        } else if (SearchParametre == 'okunanSayfa+') {
+            return b.okunanSayfa - a.okunanSayfa;
+
+
+
+        } else if (SearchParametre == 'kitapIsim+') {
+            return a.isim.localeCompare(b.isim);
+
+        } else if (SearchParametre == 'kitapIsim-') {
+            return b.isim.localeCompare(a.isim);
+
+
+
+        } else if (SearchParametre == 'kitapSayfaSayisi+') {
+            return a.sayfaSayisi - b.sayfaSayisi;
+
+        } else if (SearchParametre == 'kitapSayfaSayisi-') {
+            return b.sayfaSayisi - a.sayfaSayisi;
+
+        }
+
+
+        return 0; 
+    });
+
+    // Şimdi sıralı listeyi dolaş
+    siraliKitaplar.forEach((kitap, index) => {
+        if (kitap.id == newIndex) {
+
+            console.log('kitap düzenleme kısmı çalıştı');
+            
+            // kitap düzenleme kısmı için
             let newTarihSpilt = kitap.baslangicTarihi.split('/');
 
             let newTarih = newTarihSpilt[2]+'-'+newTarihSpilt[1]+'-'+newTarihSpilt[0];
 
-            listeDiv.innerHTML += `
-                    <div class="kitap">
-                        <div class='Ana'>
-                            <img src="${kitap.kapak}" alt="Kitap Kapağı">
-                            <div>
-                                <p><i class="fas fa-book"></i> Kitap İsmi: <input class='name' value='${kitap.isim}'></p>
-                                <p><i class="fa-regular fa-user"></i> Yazar: <input class='name' value='${kitap.yazar}'></p>
-                                <p><i class="fas fa-file-alt"></i> Sayfa Sayısı: <input type="number" class='sayfa' value='${kitap.okunanSayfa}'> / <input type="number" class='sayfa' value='${kitap.sayfaSayisi}'>
-                                <p><i class="fas fa-calendar-alt"></i> Başlangıç: <input type="date" value='${newTarih}'></p>
-                                <button onclick="saveBook(${index}, this)"><i class="fas fa-pencil-alt"></i> Kaydet</button>
-                                <p id='hataMesaj' style='color: red;'></p>
-                            </div>
-                        </div>
-                        <textarea class='notArea' rows="1" cols="10" placeholder='NOT'>${kitap.not}</textarea>
-                        <div class='yuzdelik' style='width: ${(kitap.okunanSayfa/kitap.sayfaSayisi) * 100}%;'></div>
-                    </div>
-                `;
+
+            html = KitapDüzenSablon.innerHTML;
+
+            item = html.replaceAll('{{kitapIsim}}', kitap.isim);
+            item = item.replaceAll('{{kitapYazar}}', kitap.yazar);
+            item = item.replaceAll('{{kitapKapak}}', kitap.kapak);
+            item = item.replaceAll('{{kitapOkunanSayfa}}', kitap.okunanSayfa);
+            item = item.replaceAll('{{kitapSayfaSayisi}}', kitap.sayfaSayisi);
+            item = item.replaceAll('{{kitapBaslangicTarihi}}', newTarih);
+            item = item.replaceAll('{kitapIndex}', kitap.id);
+            item = item.replaceAll('2030303030', (kitap.okunanSayfa / kitap.sayfaSayisi) * 100 + "%");
+
+            $('#kitapListesi').append(item);
         }else {
-            listeDiv.innerHTML += `
-                <div class="kitap">
-                    <div class='Ana'>
-                        <img src="${kitap.kapak}" alt="Kitap Kapağı">
-                        <div class='kitapBilgisi'>
-                            <h3><i class="fas fa-book"></i> ${kitap.isim} - ${kitap.yazar}</h3>
-                            <p><i class="fas fa-file-alt"></i> Sayfa Sayısı: ${kitap.okunanSayfa} / ${kitap.sayfaSayisi}</p>
-                            <p><i class="fas fa-calendar-alt"></i> Başlangıç: ${kitap.baslangicTarihi}</p>
-                            <div class='buttonDiv'>
-                                <button onclick="bookChange(${index});"><i class="fas fa-pencil-alt"></i> Düzenle</button>
-                                <button id='ekle' class='fitB' onclick="bookAdd(${index});"><p><i class="fa-solid fa-plus"></i> ekle</p></button>
-                                <button id='sil' class='fitB' onclick="bookDelete(${index});"><p><i class="fa-solid fa-trash-can"></i> Sil</p></button>
-                            </div>
-                        </div>
-                    </div>
-                        <textarea class='notArea' readonly rows="1" cols="10" placeholder='NOT'>${kitap.not}</textarea>
-                    <div class='yuzdelik' style='width: ${(kitap.okunanSayfa/kitap.sayfaSayisi) * 100}%;'></div>
-                </div>
-            `;
+            
+
+            html = KitapSablon.innerHTML;
+
+            item = html.replaceAll('{{kitapIsim}}', kitap.isim);
+            item = item.replaceAll('{{kitapYazar}}', kitap.yazar);
+            item = item.replaceAll('{{kitapKapak}}', kitap.kapak);
+            item = item.replaceAll('{{kitapOkunanSayfa}}', kitap.okunanSayfa);
+            item = item.replaceAll('{{kitapSayfaSayisi}}', kitap.sayfaSayisi);
+            item = item.replaceAll('{{kitapBaslangicTarihi}}', kitap.baslangicTarihi);
+            item = item.replaceAll('{kitapIndex}', kitap.id);
+            item = item.replaceAll('2030303030', (kitap.okunanSayfa / kitap.sayfaSayisi) * 100 + "%");
+
+            $('#kitapListesi').append(item);
         }
     });
 }
@@ -155,6 +244,16 @@ function bookAdd(index){
     SayfaEkleme(function(confirmed, modal) {
         if (confirmed) {
             let yeniSayfa = Number(document.getElementById('okunanSayfa').value);
+            if (yeniSayfa == '') {
+                console.log("Okuduğun sayfa sayısını boş bırakmayın.");
+                Swal.fire("Hata!", "Okuduğun sayfa sayısını boş bırakmayın! isterseniz iptal edin.", "error");
+                return;
+            }
+            if (kitap.sayfaSayisi == kitap.okunanSayfa) {
+                console.log("Bu kitabı zaten bitirdiniz.");
+                Swal.fire("Hata!", "Bu kitabı zaten bitirdiniz! Eğer okunan sayfa sayısını azaltmak istiyorsanız düzenleyebilirsiniz", "error");
+                return;
+            }
             if (yeniSayfa + kitap.okunanSayfa > kitap.sayfaSayisi) {
                 console.log("Okuduğun sayfa sayısı toplam sayfadan büyük olamaz.");
                 Swal.fire("Hata!", "Okuduğun sayfa sayısı toplam sayfadan büyük olamaz.", "error");
@@ -162,9 +261,10 @@ function bookAdd(index){
             }
             if (yeniSayfa <= 0) {
                 console.log("Okuduğun sayfa sayısı 0'dan küçük olamaz.");
-                Swal.fire("Hata!", "Okuduğun sayfa sayısı 0'dan küçük olamaz.", "error");
+                Swal.fire("Hata!", "Okuduğun sayfa sayısı 0'dan büyük olmalı.", "error");
                 return;
             }
+            
 
             modal.style.display = "none";
             sayfaGuncelle(index, yeniSayfa + kitap.okunanSayfa);
@@ -189,7 +289,7 @@ function bookDelete(index){
         if (result.isConfirmed) {
             kitaplar.splice(index, 1);
             localStorage.setItem('kitaplar', JSON.stringify(kitaplar));
-            kitaplariGoster(index);
+            kitaplariGoster();
             Swal.fire("Silindi!", "Kitap başarıyla silindi.", "success");
         }
     });
@@ -223,8 +323,8 @@ function saveBook(index,book) {
         hataMesaj.innerHTML = "okuduğun sayfa sayısı 0'dan küçük olamaz";
         return;
     }
-    if (bookPage < 0) {
-        hataMesaj.innerHTML = "sayfa sayısı 0'dan küçük olamaz";
+    if (bookPage <= 0) {
+        hataMesaj.innerHTML = "sayfa sayısı 0'dan büyük olamalı";
         return;
     }
     if (bookReadPage > bookPage) {
@@ -233,10 +333,13 @@ function saveBook(index,book) {
     }
 
     //Tarih Kontrolü
-    /* if (!bookStartDate) {
-        hataMesaj.innerHTML = "okuduğun sayfa sayısı 0'dan küçük olamaz";
+    let şimdikiZaman = new Date();
+    let girilenTarih = new Date(bookStartDate[0], bookStartDate[1] - 1, bookStartDate[2]);
+
+    if (girilenTarih > şimdikiZaman) {
+        hataMesaj.innerHTML = "Okumaya başladığın tarih bugünden büyük olamaz";
         return;
-    } */
+    }
 
     kitaplar[index].isim = bookName;
     kitaplar[index].yazar = bookRaiter;
@@ -262,6 +365,7 @@ function sayfaGuncelle(index, yeniSayfa) {
     kitaplariGoster();
 }
 
+/* 
 function arkaPlanSembolleri() {
     const semboller = ['fa-book', 'fa-pen', 'fa-book-open', 'fa-feather-alt', 'fa-scroll'];
     let x = 100, y = 0; yIndex = 0;
@@ -292,8 +396,8 @@ function arkaPlanSembolleri() {
             yIndex = y;
         }
     }
-}
-
+} */
+/* 
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
@@ -301,17 +405,10 @@ function debounce(func, wait) {
         timeout = setTimeout(() => func.apply(this, args), wait);
     };
 }
+ */
+/* const debouncedArkaPlanSembolleri = debounce(arkaPlanSembolleri, 200); */
+// arkaPlanSembolleri();
 
-const debouncedArkaPlanSembolleri = debounce(arkaPlanSembolleri, 200);
-
-const gozetle = new ResizeObserver(() => {
-    debouncedArkaPlanSembolleri();
-});
-
-gozetle.observe(document.body);
-gozetle.observe(document.documentElement);
-
-arkaPlanSembolleri();
 kitaplariGoster();
 
 // Arama türünü değiştirme butonu
@@ -332,3 +429,36 @@ document.getElementById('aramaTuruButton').addEventListener('click', () => {
         document.getElementById('kitapAdi').placeholder = 'Kitap ismi girin..';
     }
 });
+
+if (localStorage.getItem('gridType') == 'big-grid'){
+    bigGrid();
+}else if (localStorage.getItem('gridType') == 'small-grid'){
+    smallGrid();
+}else {
+    localStorage.setItem('gridType', 'small-grid');
+}
+
+function bigGrid(){
+    let kitapListesi = document.getElementById('kitapListesi');
+    let Buttons = document.getElementById('gridButtons');
+    kitapListesi.classList.remove('small-grid');
+    kitapListesi.classList.add('big-grid');
+    
+    localStorage.setItem('gridType', 'big-grid');
+
+    Buttons.children[1].style.display = 'none';
+    Buttons.children[0].style.display = 'block';
+}
+
+function smallGrid(){
+    let kitapListesi = document.getElementById('kitapListesi');
+    let Buttons = document.getElementById('gridButtons');
+    kitapListesi.classList.remove('big-grid');
+    kitapListesi.classList.add('small-grid');
+
+
+    localStorage.setItem('gridType', 'small-grid');
+
+    Buttons.children[1].style.display = 'block';
+    Buttons.children[0].style.display = 'none';
+}
