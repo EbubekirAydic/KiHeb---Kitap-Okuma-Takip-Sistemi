@@ -2,20 +2,16 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>KiHeb · Kitap Takip</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  
   <style>
     :root {
       --primary: #4f46e5;
       --primary-dark: #4338ca;
       --accent: #06b6d4;
       --success: #10b981;
-      --warning: #f59e0b;
       --danger: #ef4444;
       --bg: #f8fafc;
       --card: #ffffff;
@@ -28,22 +24,49 @@
       --shadow-lg: 0 10px 28px rgba(15, 23, 42, 0.12);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    /* Animasyonlar */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    html, body {
-      height: 100%;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
-    body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     header {
@@ -54,59 +77,70 @@
       border-bottom: 1px solid var(--border);
       padding: 12px 16px;
       box-shadow: var(--shadow);
+      animation: slideDown 0.4s ease-out;
     }
 
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    
     .header-title h1 {
       font-size: 18px;
       font-weight: 700;
       color: var(--primary);
       margin: 0;
+      transition: transform 0.3s ease;
     }
 
-    .header-title p {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin: 4px 0 0 0;
+    .header-title h1:hover {
+      transform: scale(1.05);
     }
 
-    .search-wrapper {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
-
-    .search-bar {
-      display: flex;
-      gap: 8px;
-    }
-
+    .header-title p { font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0; }
+    .search-wrapper { position: relative; flex: 1; max-width: 400px; min-width: 200px; }
+    .search-bar { display: flex; gap: 8px; }
+    
     .search-bar input {
       flex: 1;
       padding: 8px 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 14px;
+      transition: all 0.3s ease;
     }
 
-    .header-actions {
-      display: flex;
-      gap: 8px;
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      transform: translateY(-2px);
     }
+
+    .header-actions { display: flex; gap: 8px; }
 
     button {
       font-family: inherit;
       cursor: pointer;
       border: none;
       transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:active::before {
+      width: 300px;
+      height: 300px;
     }
 
     .btn {
@@ -117,46 +151,75 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transform: translateY(0);
     }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
     }
 
-    .btn-primary:active {
-      background: var(--primary-dark);
+    .btn:active {
+      transform: translateY(0);
     }
 
-    .btn-secondary {
-      background: var(--border);
-      color: var(--text);
-    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:active { background: var(--primary-dark); }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-icon { width: 40px; height: 40px; padding: 0; justify-content: center; border-radius: 50%; }
 
-    .btn-success {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-icon {
-      width: 40px;
-      height: 40px;
-      padding: 0;
+    .auth-section {
+      display: flex;
+      align-items: center;
       justify-content: center;
-      border-radius: 50%;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
+      min-height: 100vh;
       padding: 16px;
+      animation: fadeIn 0.5s ease-out;
     }
 
+    .auth-card {
+      background: var(--card);
+      padding: 32px 24px;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    .auth-card h2 { font-size: 28px; font-weight: 700; text-align: center; color: var(--primary); margin-bottom: 8px; }
+    .auth-card p { text-align: center; color: var(--text-muted); margin-bottom: 20px; }
+    .auth-buttons { display: flex; flex-direction: column; gap: 12px; }
+    
+    .form-input {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card);
+      color: var(--text);
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    #app-section { display: none; flex-direction: column; min-height: 100vh; }
+    #app-section.active {
+      animation: fadeIn 0.4s ease-out;
+    }
+    #app-section > main { flex: 1; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -170,18 +233,32 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
       text-align: center;
+      animation: fadeIn 0.5s ease-out backwards;
+      transition: all 0.3s ease;
     }
 
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
     }
 
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    
     .stat-value {
       font-size: 24px;
       font-weight: 700;
       color: var(--primary);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover .stat-value {
+      transform: scale(1.2);
     }
 
     .controls {
@@ -193,56 +270,31 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      animation: fadeIn 0.6s ease-out 0.5s backwards;
     }
 
-    @media (min-width: 768px) {
-      .controls {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-    }
-
-    .controls-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    @media (min-width: 768px) {
-      .controls-group {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-      }
-    }
-
-    .controls select,
-    .controls input[type="date"] {
+    @media (min-width: 768px) { .controls { flex-direction: row; align-items: center; justify-content: space-between; } }
+    .controls-group { display: flex; flex-direction: column; gap: 8px; }
+    @media (min-width: 768px) { .controls-group { flex-direction: row; align-items: center; gap: 10px; } }
+    
+    .controls select, .controls input[type="date"] {
       padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 14px;
       min-width: 120px;
+      transition: all 0.3s ease;
     }
 
-    .books-list {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 100px;
+    .controls select:focus, .controls input[type="date"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
-    .books-list.compact {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-
-    @media (min-width: 768px) {
-      .books-list.wide {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    .books-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 100px; }
+    .books-list.compact { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    
     .book-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -251,45 +303,41 @@
       display: flex;
       flex-direction: row;
       box-shadow: var(--shadow);
-      transition: box-shadow 0.2s ease;
+      transition: all 0.3s ease;
+      animation: fadeIn 0.5s ease-out backwards;
+      opacity: 0;
     }
 
-    .book-card.compact {
-      flex-direction: column;
+    .book-card.animate {
+      opacity: 1;
     }
 
+    .book-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .book-card.compact { flex-direction: column; }
+    
     .book-cover {
       width: 80px;
       height: 120px;
       flex-shrink: 0;
       object-fit: cover;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: transform 0.3s ease;
     }
 
-    .book-card.compact .book-cover {
-      width: 100%;
-      height: 150px;
+    .book-card:hover .book-cover {
+      transform: scale(1.05);
     }
 
-    .book-info {
-      padding: 12px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .book-title {
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.3;
-    }
-
-    .book-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
+    .book-card.compact .book-cover { width: 100%; height: 150px; }
+    .book-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .book-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+    .book-meta { font-size: 12px; color: var(--text-muted); }
+    
     .book-progress {
       width: 100%;
       height: 6px;
@@ -302,36 +350,15 @@
     .book-progress-bar {
       height: 100%;
       background: linear-gradient(90deg, var(--primary), var(--accent));
-      transition: width 0.3s ease;
+      transition: width 1.2s ease;
+      animation: shimmer 3s infinite;
+      background-size: 200% 100%;
     }
 
-    .book-stats {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .book-location {
-      font-size: 11px;
-      color: var(--text-muted);
-      padding: 6px;
-      background: var(--bg);
-      border-radius: 6px;
-    }
-
-    .book-actions {
-      display: flex;
-      gap: 6px;
-      padding: 8px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      margin: 8px -12px -12px -12px;
-    }
-
-    .book-actions button {
-      flex: 1;
-      padding: 6px 8px;
-      font-size: 12px;
-    }
+    .book-stats { font-size: 11px; color: var(--text-muted); }
+    .book-location { font-size: 11px; color: var(--text-muted); padding: 6px; background: var(--bg); border-radius: 6px; }
+    .book-actions { display: flex; gap: 6px; padding: 8px; background: var(--bg); border-top: 1px solid var(--border); margin: 8px -12px -12px -12px; }
+    .book-actions button { flex: 1; padding: 6px 8px; font-size: 12px; }
 
     .fab {
       position: fixed;
@@ -348,13 +375,16 @@
       justify-content: center;
       box-shadow: var(--shadow-lg);
       z-index: 40;
+      animation: bounce 2s infinite;
+      transition: all 0.3s ease;
     }
 
-    @media (min-width: 768px) {
-      .fab {
-        display: none;
-      }
+    .fab:hover {
+      animation: none;
+      transform: scale(1.1) rotate(90deg);
     }
+
+    @media (min-width: 768px) { .fab { display: none; } }
 
     .modal {
       display: none;
@@ -365,12 +395,12 @@
       align-items: flex-end;
       padding: 0;
       overflow-y: auto;
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.3s ease-out;
     }
 
-    .modal.active {
-      display: flex;
-    }
-
+    .modal.active { display: flex; }
+    
     .modal-content {
       background: var(--card);
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -381,34 +411,13 @@
       overflow-y: auto;
     }
 
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
     @media (min-width: 768px) {
-      .modal {
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-      }
-
-      .modal-content {
-        border-radius: var(--radius-lg);
-        width: 100%;
-        max-width: 500px;
-      }
+      .modal { align-items: center; justify-content: center; padding: 16px; }
+      .modal-content { border-radius: var(--radius-lg); width: 100%; max-width: 500px; animation: scaleIn 0.3s ease; }
     }
 
-    .modal-header {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    .modal-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    
     .modal-close {
       background: none;
       font-size: 24px;
@@ -416,57 +425,38 @@
       padding: 0;
       width: 32px;
       height: 32px;
+      transition: all 0.3s ease;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+    .modal-close:hover {
+      transform: rotate(90deg);
+      color: var(--danger);
     }
 
-    @media (min-width: 640px) {
-      .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
-
-    .form-group label {
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 13px; font-weight: 500; }
+    
+    .form-group input, .form-group textarea, .form-group select {
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 14px;
       font-family: inherit;
+      transition: all 0.3s ease;
     }
 
-    .form-group textarea {
-      resize: vertical;
-      min-height: 80px;
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      transform: translateY(-2px);
     }
 
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      grid-column: 1 / -1;
-      margin-top: 12px;
-    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-actions { display: flex; gap: 8px; justify-content: flex-end; grid-column: 1 / -1; margin-top: 12px; }
 
     .search-results {
       position: absolute;
@@ -481,22 +471,67 @@
       overflow-y: auto;
       z-index: 99;
       display: none;
+      box-shadow: var(--shadow-lg);
+      animation: slideDown 0.3s ease-out;
+    }
+
+    /* Özel Scrollbar Stilleri */
+    .search-results::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .search-results::-webkit-scrollbar-track {
+      background: var(--bg);
+      border-radius: 0 0 var(--radius) 0;
+    }
+
+    .search-results::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+      transition: background 0.3s ease;
+    }
+
+    .search-results::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Firefox Scrollbar */
+    .search-results {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) var(--bg);
     }
 
     .search-results.show {
       display: block;
     }
-
+    
     .search-result-item {
       padding: 12px;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
       display: flex;
       gap: 10px;
+      transition: all 0.3s ease;
+      animation: fadeIn 0.4s ease-out backwards;
     }
+
+    .search-result-item:nth-child(1) { animation-delay: 0.05s; }
+    .search-result-item:nth-child(2) { animation-delay: 0.1s; }
+    .search-result-item:nth-child(3) { animation-delay: 0.15s; }
+    .search-result-item:nth-child(4) { animation-delay: 0.2s; }
+    .search-result-item:nth-child(5) { animation-delay: 0.25s; }
+    .search-result-item:nth-child(6) { animation-delay: 0.3s; }
+    .search-result-item:nth-child(7) { animation-delay: 0.35s; }
+    .search-result-item:nth-child(8) { animation-delay: 0.4s; }
+    .search-result-item:nth-child(9) { animation-delay: 0.45s; }
+    .search-result-item:nth-child(10) { animation-delay: 0.5s; }
 
     .search-result-item:hover {
       background: var(--bg);
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
     }
 
     .search-result-item img {
@@ -504,6 +539,11 @@
       height: 60px;
       object-fit: cover;
       border-radius: 4px;
+      transition: transform 0.3s ease;
+    }
+
+    .search-result-item:hover img {
+      transform: scale(1.1) rotate(2deg);
     }
 
     .search-result-info {
@@ -514,11 +554,130 @@
       font-size: 13px;
       font-weight: 500;
       margin-bottom: 2px;
+      transition: color 0.3s ease;
     }
 
-    .search-result-meta {
-      font-size: 11px;
+    .search-result-item:hover .search-result-title {
+      color: var(--primary);
+    }
+
+    .search-result-meta { 
+      font-size: 11px; 
       color: var(--text-muted);
+    }
+
+    .loading {
+      animation: pulse 1.5s infinite;
+    }
+
+    .spinner {
+      animation: rotate 1s linear infinite;
+    }
+
+    /* Genel scrollbar stilleri */
+    main::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    main::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    main::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    main::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    body::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Firefox için genel scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) var(--bg);
+    }
+
+    /* Mobile bottom navigation */
+    #mobileBottomNav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1100;
+      display: none;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .mobile-nav-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-around;
+      gap: 4px;
+    }
+
+    .mobile-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 4px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      min-width: 0;
+    }
+
+    .mobile-nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .mobile-nav-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .mobile-nav-btn i {
+      font-size: 1.1rem;
+    }
+
+    .mobile-nav-btn .label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -531,80 +690,235 @@
       }
     }
 
-    .hidden {
-      display: none !important;
+    /* Mobile optimizations */
+    @media(max-width:720px){
+      
+      main {
+        margin: 0;
+      }
+
+      #mobileBottomNav {
+        display: block;
+      }
+
+      body { 
+        font-size: 0.95rem;
+      }
+
+      /* Header mobile */
+      .header-content {
+        flex-wrap: nowrap;
+        padding: 0 4px;
+      }
+
+      .header-title h1 { 
+        font-size: 16px; 
+      }
+
+      .header-title p { 
+        display: none;
+      }
+
+      .search-wrapper {
+        max-width: 100%;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .search-bar {
+        gap: 6px;
+      }
+
+      .search-bar input {
+        font-size: 13px;
+        padding: 7px 10px;
+      }
+
+      .btn-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+      }
+
+      .header-actions {
+        display: none;
+        gap: 6px;
+      }
+
+      /* Stats mobil */
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .stat-card {
+        padding: 8px;
+      }
+
+      .stat-value {
+        font-size: 18px;
+      }
+
+      .book-card {
+        padding: 8px;
+      }
+
+      .book-cover {
+        width: 60px;
+        height: 90px;
+      }
+
+      .book-title {
+        font-size: 12px;
+      }
+    }
+
+    @media(min-width:721px){
+      #mobileBottomNav {
+        display: none !important;
+      }
+    }
+
+    /* Touch-friendly improvements */
+    @media (hover: none) and (pointer: coarse) {
+      button, .btn, input, select, textarea {
+        min-height: 44px;
+      }
+
+      .btn-icon {
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .book-actions button {
+        min-height: 40px;
+      }
+
+      .search-result-item {
+        min-height: 60px;
+      }
+
+      /* Prevent zoom on input focus for iOS */
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    /* Safe area for notched devices */
+    @supports(padding: max(0px)) {
+
+      #mobileBottomNav {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div class="header-title">
-        <h1>📚 KiHeb</h1>
-        <p>Kitap Takip Sistemi</p>
+  <div id="auth-section" class="auth-section">
+    <div class="auth-card">
+      <h2>📚 KiHeb</h2>
+      <p>Kitap Takip Sistemi</p>
+      <div class="auth-buttons">
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" id="google-signin-btn">
+          <i class="fab fa-google"></i> Google ile Giriş
+        </button>
+        <div style="text-align: center; margin: 16px 0; color: var(--text-muted);">veya</div>
+        <input type="email" id="auth-email" placeholder="E-posta" class="form-input" />
+        <input type="password" id="auth-password" placeholder="Şifre" class="form-input" />
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 8px;" id="email-login-btn">Giriş Yap</button>
+        <button class="btn btn-secondary" style="width: 100%; justify-content: center;" id="email-signup-btn">Kayıt Ol</button>
       </div>
-      <div class="search-wrapper">
-        <div class="search-bar">
-          <input type="search" placeholder="Kitap, yazar ara..." id="search-input" />
-          <button class="btn btn-secondary btn-icon" id="local-search-btn" title="Kitaplığımda Ara">
-            <i class="fas fa-filter"></i>
+    </div>
+  </div>
+
+  <div id="app-section">
+    <header>
+      <div class="header-content">
+        <div class="header-title">
+          <h1>📚 KiHeb</h1>
+          <p>Kitap Takip Sistemi</p>
+        </div>
+        <div class="search-wrapper">
+          <div class="search-bar">
+            <input type="search" placeholder="Kitap, yazar ara..." id="search-input" />
+            <button class="btn btn-secondary btn-icon" id="local-search-btn" title="Kitaplığımda Ara">
+              <i class="fas fa-filter"></i>
+            </button>
+            <button class="btn btn-primary btn-icon" id="search-btn" title="Google Books'ta Ara">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <div class="search-results" id="search-results"></div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-icon" id="view-toggle" title="Geniş/Dar">
+            <i class="fas fa-th"></i>
           </button>
-          <button class="btn btn-primary btn-icon" id="search-btn" title="Google Books'ta Ara">
-            <i class="fas fa-search"></i>
+          <button class="btn btn-danger btn-icon" id="logout-btn" title="Çıkış">
+            <i class="fas fa-sign-out-alt"></i>
           </button>
         </div>
-        <div class="search-results" id="search-results"></div>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-secondary btn-icon" id="view-toggle" title="Geniş/Dar">
-          <i class="fas fa-th"></i>
+    </header>
+
+    <main>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-label">Kitap</div><div class="stat-value" id="stat-books">0</div></div>
+        <div class="stat-card"><div class="stat-label">Kitaplık</div><div class="stat-value" id="stat-shelves">0</div></div>
+        <div class="stat-card"><div class="stat-label">Raf</div><div class="stat-value" id="stat-racks">0</div></div>
+        <div class="stat-card"><div class="stat-label">Okundu (Sayfa)</div><div class="stat-value" id="stat-pages">0</div></div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-group">
+          <select id="sort-select">
+            <option value="dateDesc">Yeni Eklenenler</option>
+            <option value="dateAsc">Eski Eklenenler</option>
+            <option value="alphaAsc">A → Z</option>
+            <option value="alphaDesc">Z → A</option>
+            <option value="pagesDesc">Çok Okunan</option>
+          </select>
+          <input type="date" id="date-from" />
+          <input type="date" id="date-to" />
+          <button class="btn btn-secondary" id="apply-filters">Uygula</button>
+        </div>
+        <button class="btn btn-success" id="add-btn">
+          <i class="fas fa-plus"></i> Kitap Ekle
         </button>
       </div>
-    </div>
-  </header>
 
-  <main>
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">Kitap</div>
-        <div class="stat-value" id="stat-books">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Kitaplık</div>
-        <div class="stat-value" id="stat-shelves">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Raf</div>
-        <div class="stat-value" id="stat-racks">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Okundu (Sayfa)</div>
-        <div class="stat-value" id="stat-pages">0</div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="controls-group">
-        <select id="sort-select">
-          <option value="dateDesc">Yeni Eklenenler</option>
-          <option value="dateAsc">Eski Eklenenler</option>
-          <option value="alphaAsc">A → Z</option>
-          <option value="alphaDesc">Z → A</option>
-          <option value="pagesDesc">Çok Okunan</option>
-        </select>
-        <input type="date" id="date-from" />
-        <input type="date" id="date-to" />
-        <button class="btn btn-secondary" id="apply-filters">Uygula</button>
-      </div>
-      <button class="btn btn-success" id="add-btn">
-        <i class="fas fa-plus"></i> Kitap Ekle
-      </button>
-    </div>
-
-    <div class="books-list wide" id="books-list"></div>
-  </main>
+      <div class="books-list wide" id="books-list"></div>
+    </main>
+  </div>
 
   <button class="fab" id="fab-btn"><i class="fas fa-plus"></i></button>
+
+  <!-- Mobile bottom navigation -->
+  <nav id="mobileBottomNav" aria-label="Mobil menü">
+    <div class="mobile-nav-inner">
+      <button id="navHome" class="mobile-nav-btn">
+        <i class="fas fa-home"></i>
+        <div class="label">Ana Sayfa</div>
+      </button>
+      <button id="navSearch" class="mobile-nav-btn">
+        <i class="fas fa-search"></i>
+        <div class="label">Ara</div>
+      </button>
+      <button id="navAdd" class="mobile-nav-btn primary">
+        <i class="fas fa-plus"></i>
+        <div class="label">Ekle</div>
+      </button>
+      <button id="navView" class="mobile-nav-btn">
+        <i class="fas fa-th"></i>
+        <div class="label">Görünüm</div>
+      </button>
+      <button id="navAccount" class="mobile-nav-btn">
+        <i class="fas fa-user"></i>
+        <div class="label">Hesap</div>
+      </button>
+    </div>
+  </nav>
 
   <div class="modal" id="add-modal">
     <div class="modal-content">
@@ -613,58 +927,19 @@
         <button class="modal-close" id="modal-close">&times;</button>
       </div>
       <form class="form-grid" id="book-form">
-        <div class="form-group">
-          <label>Kitap Adı *</label>
-          <input type="text" required />
-        </div>
-        <div class="form-group">
-          <label>Yazar</label>
-          <input type="text" />
-        </div>
-        <div class="form-group">
-          <label>Yayınevi</label>
-          <input type="text" />
-        </div>
-        <div class="form-group">
-          <label>Yayın Tarihi</label>
-          <input type="date" />
-        </div>
-        <div class="form-group">
-          <label>Toplam Sayfa</label>
-          <input type="number" />
-        </div>
-        <div class="form-group">
-          <label>Okunan Sayfa</label>
-          <input type="number" />
-        </div>
-        <div class="form-group">
-          <label>Rafa Eklenme Tarihi</label>
-          <input type="date" />
-        </div>
-        <div class="form-group">
-          <label>Bitirme Tarihi</label>
-          <input type="date" />
-        </div>
-        <div class="form-group">
-          <label>Oda</label>
-          <input type="text" />
-        </div>
-        <div class="form-group">
-          <label>Kitaplık</label>
-          <input type="text" />
-        </div>
-        <div class="form-group">
-          <label>Raf</label>
-          <input type="text" />
-        </div>
-        <div class="form-group full">
-          <label>Kapak Resmi URL</label>
-          <input type="url" />
-        </div>
-        <div class="form-group full">
-          <label>Not</label>
-          <textarea></textarea>
-        </div>
+        <div class="form-group"><label>Kitap Adı *</label><input type="text" required /></div>
+        <div class="form-group"><label>Yazar</label><input type="text" /></div>
+        <div class="form-group"><label>Yayınevi</label><input type="text" /></div>
+        <div class="form-group"><label>Yayın Tarihi</label><input type="date" /></div>
+        <div class="form-group"><label>Toplam Sayfa</label><input type="number" /></div>
+        <div class="form-group"><label>Okunan Sayfa</label><input type="number" /></div>
+        <div class="form-group"><label>Rafa Eklenme Tarihi</label><input type="date" /></div>
+        <div class="form-group"><label>Bitirme Tarihi</label><input type="date" /></div>
+        <div class="form-group"><label>Oda</label><input type="text" /></div>
+        <div class="form-group"><label>Kitaplık</label><input type="text" /></div>
+        <div class="form-group"><label>Raf</label><input type="text" /></div>
+        <div class="form-group full"><label>Kapak Resmi URL</label><input type="url" /></div>
+        <div class="form-group full"><label>Not</label><textarea></textarea></div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" id="cancel-btn">İptal</button>
           <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -697,86 +972,211 @@
     let compactView = false;
     let editingKey = null;
 
+    const authSection = document.getElementById('auth-section');
+    const appSection = document.getElementById('app-section');
+    const googleSigninBtn = document.getElementById('google-signin-btn');
+    const emailLoginBtn = document.getElementById('email-login-btn');
+    const emailSignupBtn = document.getElementById('email-signup-btn');
+    const authEmail = document.getElementById('auth-email');
+    const authPassword = document.getElementById('auth-password');
+    const logoutBtn = document.getElementById('logout-btn');
+
     auth.onAuthStateChanged(user => {
-      currentUser = user;
-      if (user) loadBooks();
-    });
-
-    const modal = document.getElementById('add-modal');
-    const bookForm = document.getElementById('book-form');
-    const booksList = document.getElementById('books-list');
-    const addBtn = document.getElementById('add-btn');
-    const fabBtn = document.getElementById('fab-btn');
-    const cancelBtn = document.getElementById('cancel-btn');
-    const modalClose = document.getElementById('modal-close');
-    const viewToggle = document.getElementById('view-toggle');
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const localSearchBtn = document.getElementById('local-search-btn');
-    const searchResults = document.getElementById('search-results');
-
-    [addBtn, fabBtn].forEach(btn => btn.addEventListener('click', () => {
-      if (!currentUser) return alert('Lütfen giriş yapınız');
-      modal.classList.add('active');
-    }));
-
-    [cancelBtn, modalClose].forEach(btn => btn.addEventListener('click', () => {
-      modal.classList.remove('active');
-      bookForm.reset();
-      editingKey = null;
-    }));
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-        bookForm.reset();
+      if (user) {
+        currentUser = user;
+        authSection.style.display = 'none';
+        appSection.style.display = 'flex';
+        appSection.classList.add('active');
+        initApp();
+      } else {
+        currentUser = null;
+        authSection.style.display = 'flex';
+        appSection.style.display = 'none';
+        appSection.classList.remove('active');
       }
     });
 
-    viewToggle.addEventListener('click', () => {
-      compactView = !compactView;
-      booksList.classList.toggle('wide', !compactView);
-      booksList.classList.toggle('compact', compactView);
-      renderBooks();
+    googleSigninBtn.addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => alert('Hata: ' + err.message));
     });
 
-    bookForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!currentUser) return alert('Giriş yapınız');
-
-      const inputs = bookForm.querySelectorAll('input, textarea');
-      const book = {
-        title: inputs[0].value || 'Bilinmiyor',
-        author: inputs[1].value || '',
-        publisher: inputs[2].value || '',
-        publishedDate: inputs[3].value || '',
-        totalPages: Number(inputs[4].value) || 0,
-        pagesRead: Number(inputs[5].value) || 0,
-        addDate: inputs[6].value || new Date().toISOString().split('T')[0],
-        finishDate: inputs[7].value || '',
-        room: inputs[8].value || '',
-        bookshelf: inputs[9].value || '',
-        shelf: inputs[10].value || '',
-        cover: inputs[11].value || '',
-        note: inputs[12].value || ''
-      };
-
+    emailLoginBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+      if (!email || !password) return alert('Lütfen e-posta ve şifre girin');
       try {
-        if (editingKey) {
-          // Düzenleme modu
-          await db.ref(`users/${currentUser.uid}/books/${editingKey}`).set(book);
-          editingKey = null;
-        } else {
-          // Yeni kitap ekleme
-          await db.ref(`users/${currentUser.uid}/books`).push(book);
-        }
-        bookForm.reset();
-        modal.classList.remove('active');
-        loadBooks();
+        await auth.signInWithEmailAndPassword(email, password);
+        authEmail.value = '';
+        authPassword.value = '';
       } catch (err) {
-        alert('Hata: ' + err.message);
+        alert('Giriş hatası: ' + err.message);
       }
     });
+
+    emailSignupBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+      if (!email || !password) return alert('Lütfen e-posta ve şifre girin');
+      if (password.length < 6) return alert('Şifre en az 6 karakter olmalıdır');
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        alert('Kayıt başarılı!');
+        authEmail.value = '';
+        authPassword.value = '';
+      } catch (err) {
+        alert('Kayıt hatası: ' + err.message);
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => auth.signOut());
+
+    function initApp() {
+      const modal = document.getElementById('add-modal');
+      const bookForm = document.getElementById('book-form');
+      const booksList = document.getElementById('books-list');
+      const addBtn = document.getElementById('add-btn');
+      const fabBtn = document.getElementById('fab-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const modalClose = document.getElementById('modal-close');
+      const viewToggle = document.getElementById('view-toggle');
+      const searchInput = document.getElementById('search-input');
+      const searchBtn = document.getElementById('search-btn');
+      const localSearchBtn = document.getElementById('local-search-btn');
+
+      [addBtn, fabBtn].forEach(btn => btn.addEventListener('click', () => modal.classList.add('active')));
+      [cancelBtn, modalClose].forEach(btn => btn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        bookForm.reset();
+        editingKey = null;
+      }));
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          bookForm.reset();
+          editingKey = null;
+        }
+      });
+
+      viewToggle.addEventListener('click', () => {
+        compactView = !compactView;
+        booksList.classList.toggle('wide', !compactView);
+        booksList.classList.toggle('compact', compactView);
+        const icon = viewToggle.querySelector('i');
+        icon.classList.toggle('fa-th');
+        icon.classList.toggle('fa-list');
+        renderBooks();
+      });
+
+      bookForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const inputs = bookForm.querySelectorAll('input, textarea');
+        const book = {
+          title: inputs[0].value || 'Bilinmiyor',
+          author: inputs[1].value || '',
+          publisher: inputs[2].value || '',
+          publishedDate: inputs[3].value || '',
+          totalPages: Number(inputs[4].value) || 0,
+          pagesRead: Number(inputs[5].value) || 0,
+          addDate: inputs[6].value || new Date().toISOString().split('T')[0],
+          finishDate: inputs[7].value || '',
+          room: inputs[8].value || '',
+          bookshelf: inputs[9].value || '',
+          shelf: inputs[10].value || '',
+          cover: inputs[11].value || '',
+          note: inputs[12].value || ''
+        };
+
+        try {
+          if (editingKey) {
+            await db.ref(`users/${currentUser.uid}/books/${editingKey}`).set(book);
+            editingKey = null;
+          } else {
+            await db.ref(`users/${currentUser.uid}/books`).push(book);
+          }
+          bookForm.reset();
+          modal.classList.remove('active');
+          loadBooks();
+        } catch (err) {
+          alert('Hata: ' + err.message);
+        }
+      });
+
+      searchBtn.addEventListener('click', () => searchGoogleBooks(searchInput.value));
+      localSearchBtn.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (!query) return alert('Arama terimi girin');
+        const results = searchLocalBooks(query);
+        if (results.length === 0) return alert('Kitaplığınızda kitap bulunamadı');
+        displayLocalResults(results);
+      });
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchGoogleBooks(searchInput.value);
+      });
+
+      // Arama sonuçları dışına tıklandığında kapat
+      document.addEventListener('click', (e) => {
+        const searchWrapper = document.querySelector('.search-wrapper');
+        const searchResults = document.getElementById('search-results');
+        if (!searchWrapper.contains(e.target)) {
+          searchResults.classList.remove('show');
+        }
+      });
+
+      // Mobile bottom nav handlers
+      const navHome = document.getElementById('navHome');
+      const navSearch = document.getElementById('navSearch');
+      const navAdd = document.getElementById('navAdd');
+      const navView = document.getElementById('navView');
+      const navAccount = document.getElementById('navAccount');
+
+      if(navHome) navHome.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      if(navSearch) navSearch.addEventListener('click', () => {
+        searchInput.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      if(navAdd) navAdd.addEventListener('click', () => {
+        modal.classList.add('active');
+      });
+
+      if(navView) navView.addEventListener('click', () => {
+        viewToggle.click();
+      });
+
+      if(navAccount) navAccount.addEventListener('click', () => {
+        if (currentUser) {
+          if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+            auth.signOut();
+          }
+        } else {
+          alert('Giriş yapmak için lütfen Google ile Giriş butonunu kullanın.');
+        }
+      });
+
+      document.getElementById('sort-select').addEventListener('change', () => {
+        const sortType = document.getElementById('sort-select').value;
+        const arr = Object.entries(books);
+        arr.sort(([, a], [, b]) => {
+          if (sortType === 'dateDesc') return new Date(b.addDate || 0) - new Date(a.addDate || 0);
+          if (sortType === 'dateAsc') return new Date(a.addDate || 0) - new Date(b.addDate || 0);
+          if (sortType === 'alphaAsc') return (a.title || '').localeCompare(b.title || '');
+          if (sortType === 'alphaDesc') return (b.title || '').localeCompare(a.title || '');
+          if (sortType === 'pagesDesc') return (b.pagesRead || 0) - (a.pagesRead || 0);
+          return 0;
+        });
+        books = Object.fromEntries(arr);
+        renderBooks();
+      });
+
+      document.getElementById('apply-filters').addEventListener('click', loadBooks);
+
+      loadBooks();
+    }
 
     async function loadBooks() {
       if (!currentUser) return;
@@ -791,13 +1191,15 @@
     }
 
     function renderBooks() {
+      const booksList = document.getElementById('books-list');
       booksList.innerHTML = '';
-      Object.entries(books).forEach(([key, book]) => {
+      Object.entries(books).forEach(([key, book], index) => {
         const percent = book.totalPages ? Math.round((book.pagesRead / book.totalPages) * 100) : 0;
         const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22225%22%3E%3Crect fill=%22%23667eea%22 width=%22150%22 height=%22225%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EKitap%3C/text%3E%3C/svg%3E';
         
         const card = document.createElement('div');
         card.className = `book-card ${compactView ? 'compact' : ''}`;
+        card.style.animationDelay = `${index * 0.1}s`;
         card.innerHTML = `
           <img src="${book.cover || placeholder}" alt="cover" class="book-cover" onerror="this.src='${placeholder}'" />
           <div class="book-info">
@@ -815,19 +1217,17 @@
           </div>
         `;
         booksList.appendChild(card);
+        setTimeout(() => card.classList.add('animate'), 50);
       });
     }
 
     function updateStats() {
       const keys = Object.keys(books);
       document.getElementById('stat-books').textContent = keys.length;
-
       const shelves = new Set(Object.values(books).map(b => b.bookshelf).filter(Boolean));
       const racks = new Set(Object.values(books).map(b => b.shelf).filter(Boolean));
       let pages = 0;
-
       Object.values(books).forEach(b => pages += Number(b.pagesRead) || 0);
-
       document.getElementById('stat-shelves').textContent = shelves.size;
       document.getElementById('stat-racks').textContent = racks.size;
       document.getElementById('stat-pages').textContent = pages;
@@ -836,9 +1236,8 @@
     window.editBook = async (key) => {
       const book = books[key];
       if (!book) return;
-
       editingKey = key;
-      const inputs = bookForm.querySelectorAll('input, textarea');
+      const inputs = document.getElementById('book-form').querySelectorAll('input, textarea');
       inputs[0].value = book.title || '';
       inputs[1].value = book.author || '';
       inputs[2].value = book.publisher || '';
@@ -852,13 +1251,11 @@
       inputs[10].value = book.shelf || '';
       inputs[11].value = book.cover || '';
       inputs[12].value = book.note || '';
-
-      modal.classList.add('active');
+      document.getElementById('add-modal').classList.add('active');
     };
 
     window.deleteBook = async (key) => {
       if (!confirm('Bu kitabı silmek istediğinize emin misiniz? İşlem geri alınamaz.')) return;
-
       try {
         await db.ref(`users/${currentUser.uid}/books/${key}`).remove();
         loadBooks();
@@ -866,44 +1263,6 @@
         alert('Hata: ' + err.message);
       }
     };
-
-    document.getElementById('sort-select').addEventListener('change', () => {
-      const sortType = document.getElementById('sort-select').value;
-      const arr = Object.entries(books);
-
-      arr.sort(([, a], [, b]) => {
-        if (sortType === 'dateDesc') return new Date(b.addDate || 0) - new Date(a.addDate || 0);
-        if (sortType === 'dateAsc') return new Date(a.addDate || 0) - new Date(b.addDate || 0);
-        if (sortType === 'alphaAsc') return (a.title || '').localeCompare(b.title || '');
-        if (sortType === 'alphaDesc') return (b.title || '').localeCompare(a.title || '');
-        if (sortType === 'pagesDesc') return (b.pagesRead || 0) - (a.pagesRead || 0);
-        return 0;
-      });
-
-      books = Object.fromEntries(arr);
-      renderBooks();
-    });
-
-    document.getElementById('apply-filters').addEventListener('click', () => {
-      loadBooks();
-    });
-
-    searchBtn.addEventListener('click', () => searchGoogleBooks(searchInput.value));
-    
-    localSearchBtn.addEventListener('click', () => {
-      const query = searchInput.value.trim();
-      if (!query) return alert('Arama terimi girin');
-      const results = searchLocalBooks(query);
-      if (results.length === 0) {
-        alert('Kitaplığınızda kitap bulunamadı');
-        return;
-      }
-      displayLocalResults(results);
-    });
-
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchGoogleBooks(searchInput.value);
-    });
 
     function searchLocalBooks(query) {
       const q = query.toLowerCase();
@@ -914,6 +1273,8 @@
     }
 
     function displayLocalResults(results) {
+      const searchResults = document.getElementById('search-results');
+      
       searchResults.innerHTML = '';
       results.slice(0, 10).forEach(book => {
         const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%234f46e5%22 width=%2240%22 height=%2260%22/%3E%3C/svg%3E';
@@ -927,29 +1288,32 @@
             <div class="search-result-meta">${book.publisher || ''}</div>
           </div>
         `;
-
         div.addEventListener('click', () => {
           editBook(book.key);
           searchResults.classList.remove('show');
-          searchInput.value = '';
+          document.getElementById('search-input').value = '';
         });
-
         searchResults.appendChild(div);
       });
+      
       searchResults.classList.add('show');
     }
 
     async function searchGoogleBooks(query) {
       if (!query.trim()) return;
+      
+      const searchResults = document.getElementById('search-results');
+
+      searchResults.innerHTML = '<div style="padding: 20px; text-align: center;" class="loading"><i class="fas fa-spinner spinner"></i> Aranıyor...</div>';
+      searchResults.classList.add('show');
 
       try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5`);
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10`);
         const data = await response.json();
 
         searchResults.innerHTML = '';
         if (!data.items) {
-          searchResults.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--text-muted);">Kitap bulunamadı</div>';
-          searchResults.classList.add('show');
+          searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">Kitap bulunamadı</div>';
           return;
         }
 
@@ -969,7 +1333,7 @@
           `;
 
           div.addEventListener('click', () => {
-            const inputs = bookForm.querySelectorAll('input, textarea');
+            const inputs = document.getElementById('book-form').querySelectorAll('input, textarea');
             inputs[0].value = info.title || '';
             inputs[1].value = (info.authors || []).join(', ');
             inputs[2].value = info.publisher || '';
@@ -978,18 +1342,15 @@
             inputs[11].value = info.imageLinks?.thumbnail || '';
 
             searchResults.classList.remove('show');
-            searchInput.value = '';
-            modal.classList.add('active');
+            document.getElementById('search-input').value = '';
+            document.getElementById('add-modal').classList.add('active');
           });
 
           searchResults.appendChild(div);
         });
-
-        searchResults.classList.add('show');
       } catch (err) {
         console.error('Arama hatası:', err);
-        searchResults.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--danger);">Arama başarısız oldu</div>';
-        searchResults.classList.add('show');
+        searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">Arama başarısız oldu</div>';
       }
     }
   </script>
