@@ -1271,7 +1271,7 @@
         return searchText.includes(q);
       }).map(([key, book]) => ({ key, ...book }));
     }
-
+    
     function displayLocalResults(results) {
       const searchResults = document.getElementById('search-results');
       
@@ -1289,7 +1289,7 @@
           </div>
         `;
         div.addEventListener('click', () => {
-          editBook(book.key);
+          focusOnBook(book.key);
           searchResults.classList.remove('show');
           document.getElementById('search-input').value = '';
         });
@@ -1298,7 +1298,18 @@
       
       searchResults.classList.add('show');
     }
-
+    
+    function focusOnBook(key) {
+      const booksList = document.getElementById('books-list');
+      const bookCards = booksList.querySelectorAll('.book-card');
+      bookCards.forEach(card => {
+        if (card.querySelector('.book-actions button').getAttribute('onclick') === `editBook('${key}')`) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.boxShadow = '0 0 10px var(--primary)';
+          setTimeout(() => card.style.boxShadow = '', 2000);
+        }
+      });
+    }
     async function searchGoogleBooks(query) {
       if (!query.trim()) return;
       
