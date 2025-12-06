@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -6,6 +7,7 @@
   <title>KiHeb · Kitap Takip</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/style.css">
   <style>
     :root {
       --primary: #4f46e5;
@@ -218,7 +220,7 @@
     }
     #app-section > main { flex: 1; }
 
-    main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    main { /* max-width: 1200px; */ margin: 0 5vw; padding: 16px; }
     
     .stats {
       display: grid;
@@ -292,8 +294,9 @@
       box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
-    .books-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 100px; }
-    .books-list.compact { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    /* Wide view: show responsive card grid instead of single full-width rows */
+    .books-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 100px; align-items: stretch;}
+    .books-list.compact { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
     
     .book-card {
       background: var(--card);
@@ -321,20 +324,22 @@
     .book-card.compact { flex-direction: column; }
     
     .book-cover {
-      width: 80px;
-      height: 120px;
+      width: 100px;
+      aspect-ratio: 2 / 3; /* book-like proportion */
+      height: auto;
       flex-shrink: 0;
       object-fit: cover;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       transition: transform 0.3s ease;
+      border-radius: 6px;
     }
 
     .book-card:hover .book-cover {
       transform: scale(1.05);
     }
 
-    .book-card.compact .book-cover { width: 100%; height: 150px; }
-    .book-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .book-card.compact .book-cover { width: 100%; aspect-ratio: 2 / 3; height: auto; border-radius: 8px; }
+    .book-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: space-between; max-width: 900px; }
     .book-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
     .book-meta { font-size: 12px; color: var(--text-muted); }
     
@@ -409,6 +414,8 @@
       animation: slideUp 0.3s ease;
       max-height: 90vh;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     @media (min-width: 768px) {
@@ -446,6 +453,9 @@
       font-size: 14px;
       font-family: inherit;
       transition: all 0.3s ease;
+      /* use page background for inputs so they don't look bright white */
+      background: var(--bg);
+      color: var(--text);
     }
 
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
@@ -504,6 +514,111 @@
     .search-results.show {
       display: block;
     }
+
+    /* Accordion for extra fields inside modal */
+    .accordion { border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 6px; }
+    .acc-toggle { display:flex; align-items:center; gap:8px; background:transparent; border:none; width:100%; text-align:left; padding:8px 0; font-weight:600; color:var(--primary); cursor:pointer; }
+    .acc-toggle .chev { transition: transform 0.25s ease; }
+    .acc-content { display:none; padding-top:8px; }
+    .acc-content.show { display:block; }
+
+    /* Skeleton shimmer used by overlay and small placeholders */
+    @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
+    .skeleton { background: linear-gradient(90deg,#eee,#f5f5f5); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
+
+    /* Ensure modal important area sticks to top for readability */
+    .modal-important { position: sticky; top: 0; background: transparent; z-index: 2; padding-bottom:8px }
+
+    /* Libraries / Shelves visuals */
+    /* Libraries / Shelves visuals (warm wood palette) */
+    .library-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 22px rgba(15,23,42,0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      overflow: visible;
+      min-height: 140px;
+      overflow: auto;
+    }
+
+    .library-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(15,23,42,0.08); }
+
+    .library-card .lib-header { display:flex;align-items:center;justify-content:space-between;gap:8px }
+
+    /* shelf: dark blue theme to match site */
+    .shelf-card { background: linear-gradient(180deg,#1e293b,#0f172a); border-radius:8px; padding:8px; color:#ffffff }
+
+    /* Fixed-height shelf so adding/removing spines doesn't change layout height */
+    .shelf-drop { 
+      background: #0f172a; 
+      border-radius:6px; 
+      border:1px solid rgba(255,255,255,0.06); 
+      display:flex;
+      gap:6px; 
+      padding:8px; 
+      overflow-x:auto; 
+      overflow-y:hidden;
+      min-height: 150px; /* keep shelf height stable even when empty */
+      align-items: center;
+    }
+
+    .book-spine { width: 100px; height: 150px; border-radius:4px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor:default; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(0,0,0,0.06); margin-right:6px; flex: 0 0 auto; scroll-snap-align: start; }
+    .book-spine img.shelf-cover { width:100%; height:100%; object-fit:cover; display:block }
+    .book-spine .shelf-title { padding:6px; font-size:11px; text-align:center; color:var(--text); background:transparent; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+
+    /* small grab area inside book spine used to move the book; rest of spine can be used to pan the shelf */
+    .spine-grab {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor:grab;
+      z-index: 5;
+      user-select: none;
+    }
+
+    .book-spine { position: relative; }
+
+     /* Prevent text selection inside book spines (except the grab handle),
+       and keep UI tidy when pressing book areas. */
+     .book-spine, .book-spine * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+    .book-spine.dragging { opacity: 0.7; cursor:grabbing; transform: scale(1.02); }
+
+    .drag-source-placeholder { display:inline-block; background: transparent; border-radius:4px; margin-right:6px; }
+    .book-insert-placeholder { width:12px; height:120px; display:inline-block; background: rgba(255,255,255,0.04); border-radius:4px; margin-right:6px; }
+    .shelf-card.insert-before, .shelf-card.insert-after { outline: 2px dashed rgba(255,255,255,0.06); }
+    .library-card.insert-before, .library-card.insert-after { outline: 2px dashed rgba(255,255,255,0.06); }
+
+    /* scrollbars for shelf drops */
+    .shelf-drop::-webkit-scrollbar { height: 10px; }
+    .shelf-drop::-webkit-scrollbar-track { background: transparent; }
+    .shelf-drop::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 6px; }
+    .shelf-drop:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+
+    .shelf-anim { animation: shelfIn 600ms cubic-bezier(.2,.9,.3,1); }
+    @keyframes shelfIn { from { opacity: 0; transform: translateY(12px) scaleY(0.98); } to { opacity: 1; transform: translateY(0) scaleY(1); } }
+
+    /* Add-chooser overlay (select existing book to add to shelf) */
+    .add-chooser-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.45); display:flex; align-items:center; justify-content:center; z-index:2200; }
+    .add-chooser { width: 92%; max-width:720px; background: var(--card); border-radius: 12px; padding: 12px; box-shadow: 0 20px 60px rgba(2,6,23,0.3); }
+    .add-chooser h3 { margin:0 0 8px 0; font-size:18px; color:var(--text); }
+    .add-chooser .list { max-height: 56vh; overflow:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+    .add-chooser .item { display:flex; gap:8px; align-items:center; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background: linear-gradient(180deg,#0f4a8a,#0a315f); color: #fff }
+    .add-chooser .item img { width:40px; height:60px; object-fit:cover; border-radius:4px; flex-shrink:0; }
+    .add-chooser .item .meta { flex:1; color: #fff }
+    .add-chooser .item .meta { flex:1; }
+    .add-chooser .actions { display:flex; gap:8px; justify-content:flex-end; }
+
     
     .search-result-item {
       padding: 12px;
@@ -701,18 +816,18 @@
         display: block;
       }
 
-      body { 
-        font-size: 0.95rem;
-      }
-
-      /* Header mobile */
-      .header-content {
-        flex-wrap: nowrap;
-        padding: 0 4px;
-      }
-
-      .header-title h1 { 
-        font-size: 16px; 
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        /* increase z-index so modals appear above header and bottom nav */
+        z-index: 1200;
+        align-items: flex-end;
+        padding: 0;
+        overflow-y: auto;
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s ease-out;
       }
 
       .header-title p { 
@@ -765,8 +880,9 @@
       }
 
       .book-cover {
-        width: 60px;
-        height: 90px;
+        width: 120px;
+        aspect-ratio: 2 / 3;
+        height: auto;
       }
 
       .book-title {
@@ -805,6 +921,10 @@
       }
     }
 
+    /* Minimize libraries/shelves visuals while dragging large items to allow scrolling */
+    .compact-while-dragging .library-card { transform: scale(0.96); opacity: 0.92; max-height: 92px; overflow: hidden; transition: transform 0.15s ease, max-height 0.15s ease; }
+    .shelves-list.compact-while-dragging .shelf-card { transform: scale(0.98); opacity: 0.92; max-height: 96px; overflow: hidden; transition: transform 0.15s ease, max-height 0.15s ease; }
+
     /* Safe area for notched devices */
     @supports(padding: max(0px)) {
 
@@ -832,6 +952,8 @@
     </div>
   </div>
 
+  <!-- Skeleton overlay removed -->
+
   <div id="app-section">
     <header>
       <div class="header-content">
@@ -854,6 +976,9 @@
         <div class="header-actions">
           <button class="btn btn-secondary btn-icon" id="view-toggle" title="Geniş/Dar">
             <i class="fas fa-th"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon" id="libs-btn" title="Kütüphaneler">
+            <i class="fas fa-book"></i>
           </button>
           <button class="btn btn-danger btn-icon" id="logout-btn" title="Çıkış">
             <i class="fas fa-sign-out-alt"></i>
@@ -890,9 +1015,21 @@
 
       <div class="books-list wide" id="books-list"></div>
     </main>
-  </div>
 
-  <button class="fab" id="fab-btn"><i class="fas fa-plus"></i></button>
+    <!-- Libraries / Shelves manager (hidden by default, toggled by header button) -->
+    <section id="libraries-section" style="display:none; padding:16px;">
+      <div class="controls">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input id="new-lib-name" placeholder="Yeni kitaplık adı" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card)" />
+          <button class="btn btn-success" id="add-lib-btn">Kitaplık Ekle</button>
+        </div>
+      </div>
+
+      <div id="libs-list" style="display:grid;gap:12px;"> 
+        <!-- libraries rendered here -->
+      </div>
+    </section>
+  </div>
 
   <!-- Mobile bottom navigation -->
   <nav id="mobileBottomNav" aria-label="Mobil menü">
@@ -901,9 +1038,9 @@
         <i class="fas fa-home"></i>
         <div class="label">Ana Sayfa</div>
       </button>
-      <button id="navSearch" class="mobile-nav-btn">
-        <i class="fas fa-search"></i>
-        <div class="label">Ara</div>
+      <button id="navLibs" class="mobile-nav-btn">
+        <i class="fas fa-book"></i>
+        <div class="label">Kitaplık</div>
       </button>
       <button id="navAdd" class="mobile-nav-btn primary">
         <i class="fas fa-plus"></i>
@@ -922,24 +1059,41 @@
 
   <div class="modal" id="add-modal">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header modal-important">
         <span>Kitap Ekle / Düzenle</span>
         <button class="modal-close" id="modal-close">&times;</button>
       </div>
       <form class="form-grid" id="book-form">
-        <div class="form-group"><label>Kitap Adı *</label><input type="text" required /></div>
-        <div class="form-group"><label>Yazar</label><input type="text" /></div>
-        <div class="form-group"><label>Yayınevi</label><input type="text" /></div>
-        <div class="form-group"><label>Yayın Tarihi</label><input type="date" /></div>
-        <div class="form-group"><label>Toplam Sayfa</label><input type="number" /></div>
-        <div class="form-group"><label>Okunan Sayfa</label><input type="number" /></div>
-        <div class="form-group"><label>Rafa Eklenme Tarihi</label><input type="date" /></div>
-        <div class="form-group"><label>Bitirme Tarihi</label><input type="date" /></div>
-        <div class="form-group"><label>Oda</label><input type="text" /></div>
-        <div class="form-group"><label>Kitaplık</label><input type="text" /></div>
-        <div class="form-group"><label>Raf</label><input type="text" /></div>
-        <div class="form-group full"><label>Kapak Resmi URL</label><input type="url" /></div>
-        <div class="form-group full"><label>Not</label><textarea></textarea></div>
+        <!-- Important fields shown first -->
+        <div class="form-group full"><label>Kitap Adı *</label><input id="f-title" type="text" required /></div>
+        <div class="form-group"><label>Yazar</label><input id="f-author" type="text" /></div>
+        <div class="form-group"><label>Toplam Sayfa</label><input id="f-totalPages" type="number" /></div>
+        <div class="form-group"><label>Okunan Sayfa</label><input id="f-pagesRead" type="number" /></div>
+        <div class="form-group"><label>Yayın Tarihi</label><input id="f-publishedDate" type="date" /></div>
+        <div class="form-group full"><label>Kapak Resmi URL</label><input id="f-cover" type="url" /></div>
+
+        <!-- Accordion for extra / optional fields marked with <> style toggle -->
+        <div class="form-group full accordion">
+          <button type="button" class="acc-toggle"><span class="chev">&lt;&gt;</span> Diğer Bilgiler</button>
+          <div class="acc-content" id="extra-fields">
+            <div class="form-group"><label>Yayınevi</label><input id="f-publisher" type="text" /></div>
+            <div class="form-group"><label>Rafa Eklenme Tarihi</label><input id="f-addDate" type="date" /></div>
+            <div class="form-group"><label>Bitirme Tarihi</label><input id="f-finishDate" type="date" /></div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px"><label>Oda</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input id="f-room" list="rooms-list" type="text" style="flex:1;" />
+                <button type="button" id="add-room-btn" class="btn btn-primary">Oda Ekle</button>
+              </div>
+              <datalist id="rooms-list"></datalist>
+            </div>
+            <div class="form-group"><label>Kitaplık</label><input id="f-bookshelf" type="text" list="bookshelf-list" /></div>
+            <datalist id="bookshelf-list"></datalist>
+            <div class="form-group"><label>Raf</label><input id="f-shelf" type="text" list="shelf-list" /></div>
+            <datalist id="shelf-list"></datalist>
+            <div class="form-group full"><label>Not</label><textarea id="f-note"></textarea></div>
+          </div>
+        </div>
+
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" id="cancel-btn">İptal</button>
           <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -969,7 +1123,10 @@
 
     let currentUser = null;
     let books = {};
-    let compactView = false;
+    let libraries = {};
+    let roomsMap = {};
+    // restore saved books view (compact=true for compact/grid view)
+    let compactView = (localStorage.getItem('viewCompact') === 'true');
     let editingKey = null;
 
     const authSection = document.getElementById('auth-section');
@@ -1034,9 +1191,9 @@
     function initApp() {
       const modal = document.getElementById('add-modal');
       const bookForm = document.getElementById('book-form');
+      const skeletonOverlay = document.getElementById('skeleton-overlay');
       const booksList = document.getElementById('books-list');
       const addBtn = document.getElementById('add-btn');
-      const fabBtn = document.getElementById('fab-btn');
       const cancelBtn = document.getElementById('cancel-btn');
       const modalClose = document.getElementById('modal-close');
       const viewToggle = document.getElementById('view-toggle');
@@ -1044,12 +1201,41 @@
       const searchBtn = document.getElementById('search-btn');
       const localSearchBtn = document.getElementById('local-search-btn');
 
-      [addBtn, fabBtn].forEach(btn => btn.addEventListener('click', () => modal.classList.add('active')));
-      [cancelBtn, modalClose].forEach(btn => btn.addEventListener('click', () => {
-        modal.classList.remove('active');
-        bookForm.reset();
-        editingKey = null;
-      }));
+      // Apply saved view preference immediately so UI reflects user's choice
+      try {
+        if (compactView) {
+          booksList.classList.remove('wide');
+          booksList.classList.add('compact');
+          const icon = viewToggle && viewToggle.querySelector('i');
+          if (icon) { icon.classList.remove('fa-th'); icon.classList.add('fa-list'); }
+        } else {
+          booksList.classList.remove('compact');
+          booksList.classList.add('wide');
+          const icon = viewToggle && viewToggle.querySelector('i');
+          if (icon) { icon.classList.remove('fa-list'); icon.classList.add('fa-th'); }
+        }
+      } catch (e) { /* ignore if elements missing */ }
+
+      // Load auxiliary datasets for form suggestions
+      loadRooms();
+      loadLibraries();
+      // decorate any buttons with icons
+      applyButtonIcons();
+
+      // Add-room button inside modal
+      const addRoomBtn = document.getElementById('add-room-btn');
+      if (addRoomBtn) addRoomBtn.addEventListener('click', async () => {
+        const val = document.getElementById('f-room')?.value.trim();
+        if (!val) return alert('Lütfen oda adı girin');
+        try {
+          const snap = await db.ref(`users/${currentUser.uid}/rooms`).once('value');
+          const rooms = snap.val() || {};
+          const exists = Object.values(rooms).some(r => r && r.name === val);
+          if (!exists) await db.ref(`users/${currentUser.uid}/rooms`).push({ name: val });
+          await loadRooms();
+          alert('Oda kaydedildi');
+        } catch (err) { console.error('Oda ekleme hatası', err); alert('Oda eklenemedi'); }
+      });
 
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1064,29 +1250,97 @@
         booksList.classList.toggle('wide', !compactView);
         booksList.classList.toggle('compact', compactView);
         const icon = viewToggle.querySelector('i');
-        icon.classList.toggle('fa-th');
-        icon.classList.toggle('fa-list');
+        if (icon) {
+          icon.classList.toggle('fa-th');
+          icon.classList.toggle('fa-list');
+        }
+        try { localStorage.setItem('viewCompact', compactView ? 'true' : 'false'); } catch (e) { /* ignore storage errors */ }
         renderBooks();
       });
 
       bookForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const inputs = bookForm.querySelectorAll('input, textarea');
-        const book = {
-          title: inputs[0].value || 'Bilinmiyor',
-          author: inputs[1].value || '',
-          publisher: inputs[2].value || '',
-          publishedDate: inputs[3].value || '',
-          totalPages: Number(inputs[4].value) || 0,
-          pagesRead: Number(inputs[5].value) || 0,
-          addDate: inputs[6].value || new Date().toISOString().split('T')[0],
-          finishDate: inputs[7].value || '',
-          room: inputs[8].value || '',
-          bookshelf: inputs[9].value || '',
-          shelf: inputs[10].value || '',
-          cover: inputs[11].value || '',
-          note: inputs[12].value || ''
+        const get = id => (document.getElementById(id) ? document.getElementById(id).value.trim() : '');
+        const rawBook = {
+          title: get('f-title') || 'Bilinmiyor',
+          author: get('f-author'),
+          publisher: get('f-publisher'),
+          publishedDate: get('f-publishedDate'),
+          totalPages: Number(get('f-totalPages')) || 0,
+          pagesRead: Number(get('f-pagesRead')) || 0,
+          addDate: get('f-addDate') || new Date().toISOString().split('T')[0],
+          finishDate: get('f-finishDate'),
+          room: get('f-room'),
+          bookshelfName: get('f-bookshelf'),
+          shelfName: get('f-shelf'),
+          cover: get('f-cover'),
+          note: get('f-note') || ''
         };
+
+        // Ensure rooms exist as separate dataset; if new room entered, create it (keep storing human-readable name)
+        try {
+          if (rawBook.room) {
+            const roomsSnap = await db.ref(`users/${currentUser.uid}/rooms`).orderByChild('name').equalTo(rawBook.room).once('value');
+            if (!roomsSnap.exists()) {
+              await db.ref(`users/${currentUser.uid}/rooms`).push({ name: rawBook.room });
+              await loadRooms();
+            }
+          }
+        } catch (err) { console.warn('Rooms check failed', err); }
+
+        // Map bookshelfName/shelfName to IDs (create if necessary)
+        let bookshelfId = '';
+        let shelfId = '';
+        try {
+          if (rawBook.bookshelfName) {
+            const libsSnap = await db.ref(`users/${currentUser.uid}/libs`).once('value');
+            const libs = libsSnap.val() || {};
+            // try find by name
+            let foundId = Object.keys(libs).find(id => (libs[id] && libs[id].name === rawBook.bookshelfName));
+            if (!foundId) {
+              const ref = db.ref(`users/${currentUser.uid}/libs`).push();
+              await ref.set({ name: rawBook.bookshelfName, shelves: {} });
+              foundId = ref.key;
+            }
+            bookshelfId = foundId || '';
+            if (rawBook.shelfName) {
+              const shelves = (libs[bookshelfId] && libs[bookshelfId].shelves) || {};
+              let foundShelfId = Object.keys(shelves).find(sid => shelves[sid] && shelves[sid].name === rawBook.shelfName);
+              if (!foundShelfId) {
+                const sref = db.ref(`users/${currentUser.uid}/libs/${bookshelfId}/shelves`).push();
+                await sref.set({ name: rawBook.shelfName });
+                foundShelfId = sref.key;
+              }
+              shelfId = foundShelfId || '';
+            }
+            await loadLibraries();
+          }
+        } catch (err) { console.warn('Libs mapping failed', err); }
+
+        const book = {
+          title: rawBook.title,
+          author: rawBook.author,
+          publisher: rawBook.publisher,
+          publishedDate: rawBook.publishedDate,
+          totalPages: rawBook.totalPages,
+          pagesRead: rawBook.pagesRead,
+          addDate: rawBook.addDate,
+          finishDate: rawBook.finishDate,
+          // keep room as human readable name for display compatibility
+          room: rawBook.room,
+          bookshelf: bookshelfId || rawBook.bookshelfName || '',
+          shelf: shelfId || rawBook.shelfName || '',
+          cover: rawBook.cover,
+          note: rawBook.note
+        };
+
+        // assign an order for newly created book so it appears at end of shelf
+        if (!editingKey && (book.bookshelf || book.shelf)) {
+          const same = Object.values(books || {}).filter(b => b.bookshelf === (book.bookshelf||'') && b.shelf === (book.shelf||''));
+          let maxOrder = 0;
+          same.forEach(b => { const o = Number(b.order) || 0; if (o > maxOrder) maxOrder = o; });
+          book.order = computeOrderBetween(maxOrder, null);
+        }
 
         try {
           if (editingKey) {
@@ -1097,7 +1351,7 @@
           }
           bookForm.reset();
           modal.classList.remove('active');
-          loadBooks();
+          await loadBooks();
         } catch (err) {
           alert('Hata: ' + err.message);
         }
@@ -1108,7 +1362,23 @@
         const query = searchInput.value.trim();
         if (!query) return alert('Arama terimi girin');
         const results = searchLocalBooks(query);
-        if (results.length === 0) return alert('Kitaplığınızda kitap bulunamadı');
+        if (results.length === 0) {
+          const searchResults = document.getElementById('search-results');
+          searchResults.innerHTML = `
+            <div style="padding:20px;text-align:center;color:var(--text-muted);">
+              Kitaplığınızda kitap bulunamadı
+              <div style="margin-top:12px"><button id="create-local" class="btn btn-success">Yeni Kitap Oluştur</button></div>
+            </div>
+          `;
+          searchResults.classList.add('show');
+          const createLocal = document.getElementById('create-local');
+          if (createLocal) createLocal.addEventListener('click', () => { 
+            document.getElementById('f-title').value = query || '';
+            modal.classList.add('active'); 
+            searchResults.classList.remove('show'); 
+          });
+          return;
+        }
         displayLocalResults(results);
       });
       searchInput.addEventListener('keypress', (e) => {
@@ -1124,9 +1394,16 @@
         }
       });
 
+      // Modal open/close wiring
+      const fabBtn = document.getElementById('fab-btn');
+      if (addBtn) addBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.add('active'); editingKey = null; });
+      if (fabBtn) fabBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.add('active'); editingKey = null; });
+      if (cancelBtn) cancelBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.remove('active'); document.getElementById('book-form').reset(); editingKey = null; });
+      if (modalClose) modalClose.addEventListener('click', () => { document.getElementById('add-modal').classList.remove('active'); document.getElementById('book-form').reset(); editingKey = null; });
+
       // Mobile bottom nav handlers
       const navHome = document.getElementById('navHome');
-      const navSearch = document.getElementById('navSearch');
+      const navLibs = document.getElementById('navLibs');
       const navAdd = document.getElementById('navAdd');
       const navView = document.getElementById('navView');
       const navAccount = document.getElementById('navAccount');
@@ -1135,8 +1412,9 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
-      if(navSearch) navSearch.addEventListener('click', () => {
-        searchInput.focus();
+      if(navLibs) navLibs.addEventListener('click', () => {
+        const libsBtnEl = document.getElementById('libs-btn');
+        if (libsBtnEl) libsBtnEl.click();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
@@ -1145,7 +1423,9 @@
       });
 
       if(navView) navView.addEventListener('click', () => {
-        viewToggle.click();
+        // Toggle list/grid view
+        const viewToggleEl = document.getElementById('view-toggle');
+        if (viewToggleEl) viewToggleEl.click();
       });
 
       if(navAccount) navAccount.addEventListener('click', () => {
@@ -1156,6 +1436,39 @@
         } else {
           alert('Giriş yapmak için lütfen Google ile Giriş butonunu kullanın.');
         }
+      });
+
+      // Accordion toggle behavior
+      document.querySelectorAll('.acc-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const content = btn.parentElement.querySelector('.acc-content');
+          if (!content) return;
+          const chev = btn.querySelector('.chev');
+          content.classList.toggle('show');
+          if (chev) chev.style.transform = content.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        });
+      });
+
+      // Libraries manager toggle
+      const libsBtn = document.getElementById('libs-btn');
+      const libsSection = document.getElementById('libraries-section');
+      if (libsBtn && libsSection) {
+        libsBtn.addEventListener('click', () => {
+          const showing = libsSection.style.display !== 'none';
+          // hide main view and show libs view (simple tab behavior)
+          document.querySelector('main').style.display = showing ? '' : 'none';
+          libsSection.style.display = showing ? 'none' : '';
+          if (!showing) loadLibraries();
+        });
+      }
+
+      // Add library button
+      const addLibBtn = document.getElementById('add-lib-btn');
+      if (addLibBtn) addLibBtn.addEventListener('click', async () => {
+        const name = document.getElementById('new-lib-name')?.value.trim();
+        if (!name) return alert('Lütfen kitaplık adı girin');
+        await addLibrary(name);
+        document.getElementById('new-lib-name').value = '';
       });
 
       document.getElementById('sort-select').addEventListener('change', () => {
@@ -1180,26 +1493,1391 @@
 
     async function loadBooks() {
       if (!currentUser) return;
+      // if user is actively dragging, defer updating local books to avoid re-renders/flicker
+      if (window.__dragActive) { window.__pendingRefresh = true; return; }
       try {
         const snapshot = await db.ref(`users/${currentUser.uid}/books`).once('value');
         books = snapshot.val() || {};
+        // Normalize bookshelf/shelf fields: if a book stores bookshelf/shelf as names,
+        // find or create the corresponding library and shelf and update the book to store their IDs.
+        try {
+          const libsSnap = await db.ref(`users/${currentUser.uid}/libs`).once('value');
+          const libs = libsSnap.val() || {};
+          const libsByName = {};
+          Object.entries(libs).forEach(([id, l]) => { if (l && l.name) libsByName[l.name] = id; });
+
+          for (const [bk, b] of Object.entries(books || {})) {
+            if (!b) continue;
+            let updated = {};
+            // handle bookshelf (may be name or id)
+            if (b.bookshelf) {
+              // If bookshelf already matches an existing id, keep it
+              if (!libs[b.bookshelf]) {
+                // maybe it's a name
+                const foundId = libsByName[b.bookshelf];
+                if (foundId) {
+                  updated.bookshelf = foundId;
+                } else {
+                  // create new library with this name
+                  const nlRef = db.ref(`users/${currentUser.uid}/libs`).push();
+                  await nlRef.set({ name: b.bookshelf, shelves: {} });
+                  updated.bookshelf = nlRef.key;
+                  // add to local maps to speed up subsequent matches
+                  libs[updated.bookshelf] = { name: b.bookshelf, shelves: {} };
+                  libsByName[b.bookshelf] = updated.bookshelf;
+                }
+              }
+            }
+
+            // handle shelf (only meaningful if we have a bookshelf id)
+            if (b.shelf) {
+              let targetLibId = updated.bookshelf || (b.bookshelf && libs[b.bookshelf] ? b.bookshelf : null);
+              // if bookshelf was previously a name that matched, targetLibId may be set
+              if (!targetLibId && b.bookshelf && libsByName[b.bookshelf]) targetLibId = libsByName[b.bookshelf];
+              if (targetLibId) {
+                const shelves = (libs[targetLibId] && libs[targetLibId].shelves) || {};
+                // if shelf is an id already present
+                if (shelves[b.shelf]) {
+                  updated.shelf = b.shelf;
+                } else {
+                  // try find shelf by name
+                  const foundShelf = Object.keys(shelves).find(sid => shelves[sid] && shelves[sid].name === b.shelf);
+                  if (foundShelf) {
+                    updated.shelf = foundShelf;
+                  } else {
+                    // create shelf under targetLibId
+                    const nsRef = db.ref(`users/${currentUser.uid}/libs/${targetLibId}/shelves`).push();
+                    await nsRef.set({ name: b.shelf });
+                    updated.shelf = nsRef.key;
+                    // update local libs structure
+                    libs[targetLibId] = libs[targetLibId] || {};
+                    libs[targetLibId].shelves = libs[targetLibId].shelves || {};
+                    libs[targetLibId].shelves[updated.shelf] = { name: b.shelf };
+                  }
+                }
+              }
+            }
+
+            // if we have any updates, apply them to DB and update local books map
+            if (Object.keys(updated).length > 0) {
+              await db.ref(`users/${currentUser.uid}/books/${bk}`).update(updated);
+              books[bk] = { ...b, ...updated };
+            }
+          }
+
+          // reload libraries so UI reflects newly created libs/shelves
+          await loadLibraries();
+        } catch (err) {
+          console.warn('Normalization failed', err);
+        }
         renderBooks();
         updateStats();
       } catch (err) {
         console.error('Kitaplar yüklenemedi:', err);
+        hideSkeleton();
       }
     }
+
+    // --- Libraries / Shelves management ---
+    async function loadLibraries() {
+      if (!currentUser) return;
+      // if dragging, defer library reload to avoid visual churn
+      if (window.__dragActive) { window.__pendingRefresh = true; return; }
+      try {
+        const snap = await db.ref(`users/${currentUser.uid}/libs`).once('value');
+        const libs = snap.val() || {};
+        libraries = libs;
+        renderLibraries(libs);
+      } catch (err) {
+        console.error('Kütüphaneler yüklenemedi', err);
+      }
+    }
+
+    // ORDER helpers: compute order between two numbers; if gap too small, caller should reindex
+    function computeOrderBetween(prev, next) {
+      if (prev == null && next == null) return 1000;
+      if (prev == null) return (next || 1000) - 1000;
+      if (next == null) return (prev || 0) + 1000;
+      const a = Number(prev) || 0;
+      const b = Number(next) || (a + 2000);
+      if (b - a > 1) return Math.floor((a + b) / 2);
+      return null; // caller will need to reindex
+    }
+
+    // Drag state helpers: prevent heavy reloads while user is dragging
+    function startDrag() {
+      try {
+        window.__dragActive = true;
+        if (window.__deferredRefresh) { clearTimeout(window.__deferredRefresh); window.__deferredRefresh = null; }
+      } catch (e) { /* ignore */ }
+    }
+
+      // Pointer-driven shelf horizontal panning: when user presses a book spine background
+      // (NOT the `.spine-grab`) or the empty area of a `.shelf-drop`, allow click-drag to
+      // horizontally scroll the shelf. This intentionally does NOT start a book drag.
+      (function() {
+        let panState = null;
+
+        function beginShelfPan(ev, dropZone) {
+          try {
+            // only initiate when primary button
+            if (ev.button && ev.button !== 0) return;
+            ev.preventDefault();
+            startDrag();
+            panState = { pointerId: ev.pointerId, startX: ev.clientX, startScroll: dropZone.scrollLeft, dropZone };
+            try { dropZone.setPointerCapture && dropZone.setPointerCapture(ev.pointerId); } catch (e) {}
+            document.addEventListener('pointermove', moveShelfPan);
+            document.addEventListener('pointerup', endShelfPan);
+            document.addEventListener('pointercancel', cancelShelfPan);
+            throttledLog('panstart', ['[panstart]', { dropZone: dropZone.dataset.shelf || dropZone.className, x: ev.clientX }], 200);
+          } catch (err) { console.error('beginShelfPan', err); }
+        }
+
+        function moveShelfPan(ev) {
+          try {
+            if (!panState || (ev.pointerId && panState.pointerId !== ev.pointerId)) return;
+            const dx = ev.clientX - panState.startX;
+            panState.dropZone.scrollLeft = panState.startScroll - dx;
+            throttledLog('panmove', ['[panmove]', { dx }], 160);
+          } catch (err) { /* ignore */ }
+        }
+
+        function endShelfPan(ev) {
+          try {
+            if (!panState) return cleanup();
+            throttledLog('panend', ['[panend]', { x: ev.clientX }], 200);
+          } catch (err) { /* ignore */ } finally { cleanup(); }
+        }
+
+        function cancelShelfPan(ev) { try { cleanup(); } catch (e) {} }
+
+        function cleanup() {
+          try {
+            if (!panState) return;
+            try { panState.dropZone.releasePointerCapture && panState.dropZone.releasePointerCapture(panState.pointerId); } catch (e) {}
+            document.removeEventListener('pointermove', moveShelfPan);
+            document.removeEventListener('pointerup', endShelfPan);
+            document.removeEventListener('pointercancel', cancelShelfPan);
+            panState = null;
+          } finally { endDrag(); }
+        }
+
+        // Delegated pointerdown: start pan when pointer is on spine background (not the grab)
+        document.addEventListener('pointerdown', (ev) => {
+          try {
+            const target = ev.target;
+            // Ignore if started on the grab handle or on drag handles
+            if (target.closest && (target.closest('.spine-grab') || target.closest('.drag-handle'))) return;
+
+            // If pointer is inside a book-spine (but not on grab), pan its containing shelf
+            const spine = target.closest ? target.closest('.book-spine') : null;
+            if (spine) {
+              const drop = spine.closest ? spine.closest('.shelf-drop') : null;
+              if (drop) { beginShelfPan(ev, drop); return; }
+            }
+
+            // If pointer is directly on shelf-drop empty area, pan it
+            const dropZone = target.closest ? target.closest('.shelf-drop') : null;
+            if (dropZone) {
+              // ensure not starting on a child spine
+              if (!(target.classList && target.classList.contains('book-spine')) && !target.closest('.book-spine')) {
+                beginShelfPan(ev, dropZone);
+                return;
+              }
+            }
+          } catch (err) { /* ignore */ }
+        }, { passive: false });
+      })();
+
+      // Pointer-based book drag fallback for touch devices: start drag when the user
+      // presses the `.spine-grab` on touch/pen. This mirrors the HTML5 DnD flow
+      // but uses pointer events so it works on phones.
+      (function() {
+        let bookPtr = null; // { pointerId, key, ghost, insertPlaceholder, currentDrop }
+
+        function createBookGhost(spine) {
+          try {
+            const ghost = spine.cloneNode(true);
+            ghost.style.position = 'fixed';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.opacity = '0.95';
+            ghost.style.zIndex = 9999;
+            const rect = spine.getBoundingClientRect();
+            ghost.style.width = rect.width + 'px';
+            ghost.style.left = (rect.left) + 'px';
+            ghost.style.top = (rect.top) + 'px';
+            document.body.appendChild(ghost);
+            return ghost;
+          } catch (e) { return null; }
+        }
+
+        function beginBookPointerDrag(ev, grab) {
+          try {
+            // clear any pending long-press timer for this pointer
+            try { if (window.__bookLongPressTimers && window.__bookLongPressTimers[ev.pointerId]) { clearTimeout(window.__bookLongPressTimers[ev.pointerId]); delete window.__bookLongPressTimers[ev.pointerId]; } } catch (e) {}
+            if (ev.button && ev.button !== 0) return;
+            ev.preventDefault();
+            const spine = grab.closest ? grab.closest('.book-spine') : null;
+            if (!spine) return;
+            const key = spine.dataset.key;
+            startDrag();
+            window.__currentDrag = { type: 'book', id: key };
+
+            const ghost = createBookGhost(spine);
+            const ph = document.createElement('div');
+            ph.className = 'book-insert-placeholder';
+            ph.style.width = '12px'; ph.style.height = '120px'; ph.style.display = 'inline-block'; ph.style.background = 'rgba(255,255,255,0.04)'; ph.style.borderRadius = '4px'; ph.style.marginRight = '6px';
+
+            bookPtr = { pointerId: ev.pointerId, key, spine, ghost, insertPlaceholder: ph, currentDrop: null };
+            try { grab.setPointerCapture && grab.setPointerCapture(ev.pointerId); } catch (e) {}
+            document.addEventListener('pointermove', moveBookPointerDrag);
+            document.addEventListener('pointerup', endBookPointerDrag);
+            document.addEventListener('pointercancel', cancelBookPointerDrag);
+            throttledLog('book-ptr-start', ['[pointerstart][book]', { key, x: ev.clientX, y: ev.clientY }], 160);
+          } catch (err) { console.error('beginBookPointerDrag', err); }
+        }
+
+        function moveBookPointerDrag(ev) {
+          try {
+            if (!bookPtr || (ev.pointerId && bookPtr.pointerId !== ev.pointerId)) return;
+            const ghost = bookPtr.ghost; if (ghost) { ghost.style.left = (ev.clientX + 8) + 'px'; ghost.style.top = (ev.clientY + 8) + 'px'; }
+
+            // find a shelf-drop under the pointer
+            const el = document.elementFromPoint(ev.clientX, ev.clientY);
+            const drop = el && el.closest ? el.closest('.shelf-drop') : null;
+            // clear previous placeholder if different drop
+            if (bookPtr.currentDrop && bookPtr.currentDrop !== drop) {
+              try { if (bookPtr.insertPlaceholder.parentElement) bookPtr.insertPlaceholder.remove(); } catch (e) {}
+              bookPtr.currentDrop = null;
+            }
+            if (!drop) return;
+            // decide insertion point inside drop
+            const children = Array.from(drop.querySelectorAll('.book-spine'));
+            let inserted = false;
+            for (const child of children) {
+              const r = child.getBoundingClientRect();
+              if (ev.clientX < r.left + r.width / 2) {
+                if (bookPtr.insertPlaceholder.parentElement !== drop || bookPtr.insertPlaceholder.nextSibling !== child) drop.insertBefore(bookPtr.insertPlaceholder, child);
+                inserted = true; break;
+              }
+            }
+            if (!inserted) { if (bookPtr.insertPlaceholder.parentElement !== drop) drop.appendChild(bookPtr.insertPlaceholder); }
+            bookPtr.currentDrop = drop;
+            throttledLog('book-ptr-move', ['[pointermove][book]', { key: bookPtr.key, drop: drop.dataset.shelf || null }], 140);
+          } catch (err) { /* ignore */ }
+        }
+
+        async function endBookPointerDrag(ev) {
+          try {
+            if (!bookPtr) return cleanup();
+            const key = bookPtr.key;
+            const drop = bookPtr.currentDrop;
+            throttledLog('book-ptr-end', ['[pointerup][book]', { key, drop: drop && (drop.dataset.shelf || drop.dataset.lib) }], 140);
+            if (drop) {
+              // compute neighbors relative to placeholder
+              const prevEl = bookPtr.insertPlaceholder.previousElementSibling && bookPtr.insertPlaceholder.previousElementSibling.classList.contains('book-spine') ? bookPtr.insertPlaceholder.previousElementSibling : null;
+              const nextEl = bookPtr.insertPlaceholder.nextElementSibling && bookPtr.insertPlaceholder.nextElementSibling.classList.contains('book-spine') ? bookPtr.insertPlaceholder.nextElementSibling : null;
+              const prev = prevEl ? prevEl.dataset.key : null; const next = nextEl ? nextEl.dataset.key : null;
+              const prevOrder = prev && books[prev] ? Number(books[prev].order) : null; const nextOrder = next && books[next] ? Number(books[next].order) : null;
+              let newOrder = computeOrderBetween(prevOrder, nextOrder);
+              const libId = drop.dataset.lib; const shelfId = drop.dataset.shelf;
+              if (newOrder == null) {
+                await reindexBooks(libId, shelfId);
+                await loadBooks();
+                cleanup();
+                return;
+              }
+              await db.ref(`users/${currentUser.uid}/books/${key}`).update({ bookshelf: libId, shelf: shelfId, order: newOrder });
+              throttledLog('book-ptr-write', ['[pointerdrop][book] db.write', { key, libId, shelfId, order: newOrder }], 160);
+              // update local map to keep UI in sync until refresh
+              if (books[key]) { books[key].bookshelf = libId; books[key].shelf = shelfId; books[key].order = newOrder; }
+              await loadBooks();
+            }
+          } catch (err) { console.error('endBookPointerDrag', err); }
+          cleanup();
+        }
+
+        function cancelBookPointerDrag(ev) { try { cleanup(); } catch (e) {} }
+
+        function cleanup() {
+          try {
+            if (!bookPtr) return endDrag();
+            try { if (bookPtr.ghost && bookPtr.ghost.parentElement) bookPtr.ghost.parentElement.removeChild(bookPtr.ghost); } catch (e) {}
+            try { if (bookPtr.insertPlaceholder && bookPtr.insertPlaceholder.parentElement) bookPtr.insertPlaceholder.remove(); } catch (e) {}
+            try { document.removeEventListener('pointermove', moveBookPointerDrag); document.removeEventListener('pointerup', endBookPointerDrag); document.removeEventListener('pointercancel', cancelBookPointerDrag); } catch (e) {}
+            try { if (bookPtr && bookPtr.pointerId && bookPtr.spine) bookPtr.spine.releasePointerCapture && bookPtr.spine.releasePointerCapture(bookPtr.pointerId); } catch (e) {}
+            bookPtr = null;
+          } finally { endDrag(); }
+        }
+
+        // Delegated pointerdown for `.spine-grab` to support touch drags
+        document.addEventListener('pointerdown', (ev) => {
+          try {
+            const grab = ev.target && (ev.target.classList && ev.target.classList.contains('spine-grab') ? ev.target : (ev.target.closest ? ev.target.closest('.spine-grab') : null));
+            if (!grab) return;
+            // prefer touch/pen or devices with touch points: use a small movement threshold
+            // to start pointer-driven drag (avoid relying only on long-press). Keep long-press
+            // as a fallback. Do not change mouse native drag behavior here.
+            if (ev.pointerType === 'touch' || ev.pointerType === 'pen' || navigator.maxTouchPoints > 0) {
+              try { ev.preventDefault(); } catch (e) {}
+              const startX = ev.clientX; const startY = ev.clientY;
+              const THRESHOLD = 6; // pixels
+
+              // long-press fallback (in case user taps and holds)
+              const lpTimeout = setTimeout(() => {
+                try { beginBookPointerDrag(ev, grab); } catch (e) { console.error('longpress begin failed', e); }
+              }, 220);
+              window.__bookLongPressTimers = window.__bookLongPressTimers || {};
+              window.__bookLongPressTimers[ev.pointerId || ('m'+Date.now())] = lpTimeout;
+
+              // capture pointer so we reliably receive move/up/cancel
+              try { grab.setPointerCapture && grab.setPointerCapture(ev.pointerId); } catch (e) {}
+
+              const onMove = (mEv) => {
+                try {
+                  if (mEv.pointerId && ev.pointerId && mEv.pointerId !== ev.pointerId) return;
+                  const dx = Math.abs(mEv.clientX - startX);
+                  const dy = Math.abs(mEv.clientY - startY);
+                  if (dx > THRESHOLD || dy > THRESHOLD) {
+                    // movement exceeded threshold -> begin pointer drag
+                    cleanup();
+                    try { beginBookPointerDrag(mEv, grab); } catch (e) { console.error('begin on move failed', e); }
+                  }
+                } catch (e) { /* ignore */ }
+              };
+
+              const onUp = () => { cleanup(); };
+
+              function cleanup() {
+                try { clearTimeout(lpTimeout); } catch (e) {}
+                try { if (ev.pointerId) delete window.__bookLongPressTimers[ev.pointerId]; } catch (e) {}
+                try { grab.releasePointerCapture && grab.releasePointerCapture(ev.pointerId); } catch (e) {}
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                document.removeEventListener('pointercancel', onUp);
+              }
+
+              document.addEventListener('pointermove', onMove);
+              document.addEventListener('pointerup', onUp);
+              document.addEventListener('pointercancel', onUp);
+              return;
+            }
+
+            // For mouse when user is emulating a phone (or wants touch-like long-press),
+            // start a short long-press timer — if pointer remains down without native dragstart,
+            // begin the pointer-driven drag to emulate touch behavior.
+            const timeout = setTimeout(() => {
+              try { beginBookPointerDrag(ev, grab); } catch (e) { console.error('longpress begin failed', e); }
+            }, 220);
+            window.__bookLongPressTimers = window.__bookLongPressTimers || {};
+            window.__bookLongPressTimers[ev.pointerId || ('m'+Date.now())] = timeout;
+            // capture the pointer early so we reliably receive pointerup/pointercancel
+            try { grab.setPointerCapture && grab.setPointerCapture(ev.pointerId); } catch (e) {}
+
+            const clear = () => {
+              try { clearTimeout(timeout); } catch (e) {}
+              try { if (ev.pointerId) delete window.__bookLongPressTimers[ev.pointerId]; } catch (e) {}
+              try { grab.releasePointerCapture && grab.releasePointerCapture(ev.pointerId); } catch (e) {}
+              document.removeEventListener('pointerup', clear);
+              document.removeEventListener('pointercancel', clear);
+            };
+            document.addEventListener('pointerup', clear);
+            document.addEventListener('pointercancel', clear);
+          } catch (err) { /* ignore */ }
+        }, { passive: false });
+      })();
+
+    function endDrag() {
+      try {
+        window.__dragActive = false;
+        window.__currentDrag = null;
+        if (window.__pendingRefresh) {
+          // small debounce after drag ends to let DB settle
+          if (window.__deferredRefresh) clearTimeout(window.__deferredRefresh);
+          window.__deferredRefresh = setTimeout(async () => {
+            window.__pendingRefresh = false;
+            window.__deferredRefresh = null;
+            try { await loadBooks(); } catch (e) {}
+            try { await loadLibraries(); } catch (e) {}
+          }, 220);
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // Lightweight throttled logger for high-frequency drag events
+    function throttledLog(key, payload, ms = 150) {
+      try {
+        window.__logThrottleMap = window.__logThrottleMap || {};
+        const now = Date.now();
+        if (!window.__logThrottleMap[key] || (now - window.__logThrottleMap[key]) > ms) {
+          // keep messages concise to make it easy to paste logs
+          console.log(payload);
+          window.__logThrottleMap[key] = now;
+        }
+      } catch (e) { /* ignore logging failures */ }
+    }
+
+    async function reindexShelves(libId) {
+      if (!libraries || !libraries[libId] || !libraries[libId].shelves) return;
+      const shelves = libraries[libId].shelves || {};
+      const entries = Object.entries(shelves).map(([id, s], i) => ({ id, order: (i+1)*1000 }));
+      const updates = {};
+      entries.forEach(e => { updates[`/users/${currentUser.uid}/libs/${libId}/shelves/${e.id}/order`] = e.order; });
+      if (Object.keys(updates).length) await db.ref().update(updates);
+    }
+
+    async function reindexBooks(libId, shelfId) {
+      // gather books in shelf and reindex
+      const list = Object.entries(books || {}).filter(([, b]) => b.bookshelf === libId && b.shelf === shelfId).map(([k,b]) => ({ k, order: Number(b.order) || 0 }));
+      list.sort((a,b) => a.order - b.order || a.k.localeCompare(b.k));
+      const updates = {};
+      list.forEach((it, i) => { updates[`/users/${currentUser.uid}/books/${it.k}/order`] = (i+1)*1000; });
+      if (Object.keys(updates).length) await db.ref().update(updates);
+    }
+
+    async function reindexLibraries() {
+      if (!libraries) return;
+      const entries = Object.entries(libraries).map(([id, l], i) => ({ id, order: (i+1)*1000 }));
+      const updates = {};
+      entries.forEach(e => { updates[`/users/${currentUser.uid}/libs/${e.id}/order`] = e.order; });
+      if (Object.keys(updates).length) await db.ref().update(updates);
+    }
+
+    // Pointer-based fallback for shelf reordering (robust when HTML5 DnD aborts)
+    function beginShelfPointerDrag(ev, libId, shelfId, shelfEl, shelvesList) {
+      try {
+        ev.preventDefault();
+      } catch (e) {}
+      try {
+        startDrag();
+        window.__currentDrag = { type: 'shelf', libId, shelfId };
+        // store state globally so move/up handlers can access
+        window.__ptrShelfDrag = { libId, shelfId, shelfEl, shelvesList, pointerId: ev.pointerId, ghost: null, candidate: null };
+
+        // create a ghost element that follows the pointer
+        const ghost = shelfEl.cloneNode(true);
+        ghost.style.position = 'fixed';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.opacity = '0.95';
+        ghost.style.zIndex = 9999;
+        const rect = shelfEl.getBoundingClientRect();
+        ghost.style.width = rect.width + 'px';
+        ghost.style.left = (ev.clientX + 8) + 'px';
+        ghost.style.top = (ev.clientY + 8) + 'px';
+        document.body.appendChild(ghost);
+        window.__ptrShelfDrag.ghost = ghost;
+
+        // capture pointer on the shelf element so we reliably get move/up
+        try { shelfEl.setPointerCapture && shelfEl.setPointerCapture(ev.pointerId); } catch (e) {}
+
+        // attach global listeners
+        document.addEventListener('pointermove', moveShelfPointerDrag);
+        document.addEventListener('pointerup', endShelfPointerDrag);
+        document.addEventListener('pointercancel', cancelShelfPointerDrag);
+
+        // visual hint
+        try { if (shelvesList) shelvesList.classList.add('compact-while-dragging'); } catch (e) {}
+        console.log('[pointerdown][shelf-handle] start', { libId, shelfId, x: ev.clientX, y: ev.clientY, time: Date.now() });
+      } catch (err) { console.error('beginShelfPointerDrag', err); }
+    }
+
+    function moveShelfPointerDrag(ev) {
+      try {
+        const st = window.__ptrShelfDrag;
+        if (!st || (ev.pointerId && st.pointerId !== ev.pointerId)) return;
+        const ghost = st.ghost;
+        if (ghost) {
+          ghost.style.left = (ev.clientX + 8) + 'px';
+          ghost.style.top = (ev.clientY + 8) + 'px';
+        }
+        const children = Array.from((st.shelvesList || document).querySelectorAll('.shelf-card'));
+        let candidate = null;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          const r = child.getBoundingClientRect();
+          if (ev.clientY < r.top + r.height / 2) { candidate = child; break; }
+        }
+        children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+        if (candidate) { candidate.classList.add('insert-before'); st.candidate = { before: candidate }; }
+        else { if (children.length) children[children.length - 1].classList.add('insert-after'); st.candidate = { before: null }; }
+        // throttled pointer move log
+        throttledLog('pointermove-shelf', ['[pointermove][shelf]', { libId: st.libId, shelfId: st.shelfId, x: ev.clientX, y: ev.clientY }], 160);
+      } catch (err) { /* ignore move errors */ }
+    }
+
+    async function endShelfPointerDrag(ev) {
+      try {
+        const st = window.__ptrShelfDrag;
+        if (!st) return cleanupPointerDrag();
+        const libId = st.libId; const srcShelf = st.shelfId;
+        // determine insert index using current list
+        const children2 = Array.from((st.shelvesList || document).querySelectorAll('.shelf-card'));
+        let insertIndex = children2.length;
+        if (st.candidate && st.candidate.before) {
+          insertIndex = children2.indexOf(st.candidate.before);
+          if (insertIndex === -1) insertIndex = children2.length;
+        }
+        const prevEl = insertIndex > 0 ? children2[insertIndex - 1] : null;
+        const nextEl = insertIndex < children2.length ? children2[insertIndex] : null;
+        const prevId = prevEl ? prevEl.dataset.shelf : null;
+        const nextId = nextEl ? nextEl.dataset.shelf : null;
+        const prevOrder = prevId && libraries[libId] && libraries[libId].shelves && libraries[libId].shelves[prevId] ? Number(libraries[libId].shelves[prevId].order) : null;
+        const nextOrder = nextId && libraries[libId] && libraries[libId].shelves && libraries[libId].shelves[nextId] ? Number(libraries[libId].shelves[nextId].order) : null;
+        console.log('[pointerup][shelves-list] insertIndex', { insertIndex, prevId, nextId, prevOrder, nextOrder });
+        let newOrder = computeOrderBetween(prevOrder, nextOrder);
+        if (newOrder == null) {
+          console.log('[pointer][shelves-list] reindex needed');
+          await reindexShelves(libId);
+          await loadLibraries();
+          cleanupPointerDrag();
+          return;
+        }
+        await db.ref(`users/${currentUser.uid}/libs/${libId}/shelves/${srcShelf}/order`).set(newOrder);
+        console.log('[pointer][shelves-list] db.write done', { srcShelf, newOrder });
+        await loadLibraries();
+      } catch (err) { console.error('endShelfPointerDrag', err); }
+      cleanupPointerDrag();
+    }
+
+    function cancelShelfPointerDrag(ev) { try { console.log('[pointercancel][shelf]'); } catch (e) {} finally { cleanupPointerDrag(); } }
+
+    function cleanupPointerDrag() {
+      try {
+        const st = window.__ptrShelfDrag;
+        if (!st) return;
+        try { if (st.ghost && st.ghost.parentElement) st.ghost.parentElement.removeChild(st.ghost); } catch (e) {}
+        try { if (st.shelvesList) st.shelvesList.classList.remove('compact-while-dragging'); } catch (e) {}
+        try { document.removeEventListener('pointermove', moveShelfPointerDrag); document.removeEventListener('pointerup', endShelfPointerDrag); document.removeEventListener('pointercancel', cancelShelfPointerDrag); } catch (e) {}
+        try { if (st.shelfEl && st.pointerId) st.shelfEl.releasePointerCapture && st.shelfEl.releasePointerCapture(st.pointerId); } catch (e) {}
+        // clear visual hints
+        try { const children = Array.from((st.shelvesList || document).querySelectorAll('.shelf-card')); children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); } catch (e) {}
+        window.__ptrShelfDrag = null;
+        window.__currentDrag = null;
+        endDrag();
+      } catch (err) { /* ignore cleanup errors */ }
+    }
+
+    // Apply Font Awesome icons to buttons based on id, data-action or text
+    function applyButtonIcons(root = document) {
+      try {
+        const buttons = Array.from(root.querySelectorAll('button.btn'));
+        buttons.forEach(btn => {
+          // skip if already has an <i>
+          if (btn.querySelector('i')) return;
+          const txt = (btn.textContent || '').trim();
+          let icon = '';
+          const act = btn.dataset.action || '';
+          const id = btn.id || '';
+
+          if (id === 'google-signin-btn') icon = 'fab fa-google';
+          else if (id === 'logout-btn' || txt.toLowerCase().includes('çıkış') || txt.toLowerCase().includes('çık')) icon = 'fas fa-sign-out-alt';
+          else if (id === 'add-btn' || act.includes('add-to') || txt.includes('Ekle') || id === 'fab-btn' || id === 'navAdd') icon = 'fas fa-plus';
+          else if (act.includes('edit') || txt.includes('Düzenle') || id.includes('edit')) icon = 'fas fa-edit';
+          else if (act.includes('del') || txt.includes('Sil') || id.includes('del')) icon = 'fas fa-trash';
+          else if (id === 'search-btn' || txt.toLowerCase().includes('ara')) icon = 'fas fa-search';
+          else if (id === 'local-search-btn' || txt.toLowerCase().includes('filtre') || txt.toLowerCase().includes('filter')) icon = 'fas fa-filter';
+          else if (id === 'libs-btn' || txt.toLowerCase().includes('kütüphane') || txt.toLowerCase().includes('kitaplık')) icon = 'fas fa-book';
+          else if (id === 'view-toggle' || id === 'navView') icon = 'fas fa-th';
+          else if (id === 'email-login-btn' || txt.toLowerCase().includes('giriş') ) icon = 'fas fa-sign-in-alt';
+          else if (id === 'email-signup-btn' || txt.toLowerCase().includes('kayıt') ) icon = 'fas fa-user-plus';
+          else if (txt.toLowerCase().includes('iptal') || id === 'cancel-btn' || id === 'chooser-cancel' || id === 'modal-close') icon = 'fas fa-times';
+          else if (txt.toLowerCase().includes('kaydet') || btn.type === 'submit') icon = 'fas fa-save';
+          else if (id === 'navHome' || txt.toLowerCase().includes('ana')) icon = 'fas fa-home';
+          else if (id === 'navSearch') icon = 'fas fa-search';
+          else if (id === 'navAccount' || txt.toLowerCase().includes('hesap') ) icon = 'fas fa-user';
+          else if (id === 'add-lib-btn') icon = 'fas fa-plus-circle';
+          else if (id === 'create-from-search' || id === 'create-local' || id === 'create-from-search') icon = 'fas fa-plus';
+
+          if (icon) {
+            const i = document.createElement('i');
+            i.className = icon;
+            btn.prepend(i);
+          }
+        });
+      } catch (e) { /* ignore */ }
+    }
+
+    async function loadRooms() {
+      if (!currentUser) return;
+      try {
+        const snap = await db.ref(`users/${currentUser.uid}/rooms`).once('value');
+        const rooms = snap.val() || {};
+        const dl = document.getElementById('rooms-list');
+        roomsMap = rooms;
+        if (dl) {
+          dl.innerHTML = '';
+          Object.values(rooms).forEach(r => { if (r && r.name) { const opt = document.createElement('option'); opt.value = r.name; dl.appendChild(opt); } });
+        }
+      } catch (err) {
+        console.error('Rooms yüklenemedi', err);
+      }
+    }
+
+    // Source placeholder helpers: insert a lightweight placeholder at the original position
+    function createSrcPlaceholder(el) {
+      try {
+        if (!el) return;
+        if (el.dataset.__hasPlaceholder) return;
+        // Instead of immediately hiding the element (which in some browsers
+        // can cancel a freshly-started drag), delay the visibility change
+        // by a small amount so the drag has time to initialize.
+        el.dataset.__hasPlaceholder = '1';
+        try { if (el.dataset.__placeholderTimer) clearTimeout(Number(el.dataset.__placeholderTimer)); } catch (e) {}
+        const t = setTimeout(() => { try { el.style.visibility = 'hidden'; } catch (e) {} }, 60);
+        el.dataset.__placeholderTimer = String(t);
+      } catch (e) { /* ignore */ }
+    }
+
+    function removeSrcPlaceholder(el) {
+      try {
+        if (!el) return;
+        if (el.dataset) {
+          try { if (el.dataset.__placeholderTimer) { clearTimeout(Number(el.dataset.__placeholderTimer)); delete el.dataset.__placeholderTimer; } } catch (e) {}
+          delete el.dataset.__hasPlaceholder;
+        }
+        el.style.visibility = '';
+      } catch (e) { /* ignore */ }
+    }
+
+    // Parse drag payloads like 'book:<id>', 'lib:<id>' or 'shelf:<libId>:<shelfId>'
+    function parseDragPayload(payload) {
+      if (!payload || typeof payload !== 'string') return null;
+      if (payload.startsWith('book:')) return { type: 'book', id: payload.slice(5) };
+      if (payload.startsWith('lib:')) return { type: 'lib', id: payload.slice(4) };
+      if (payload.startsWith('shelf:')) {
+        const parts = payload.split(':');
+        return { type: 'shelf', libId: parts[1] || null, shelfId: parts[2] || null };
+      }
+      // legacy: plain id — treat as book id
+      return { type: 'book', id: payload };
+    }
+
+    function renderLibraries(libs) {
+      const container = document.getElementById('libs-list');
+      container.innerHTML = '';
+      // datalist elements for form suggestions (define once)
+      const bookshelfDL = document.getElementById('bookshelf-list');
+      const shelfDL = document.getElementById('shelf-list');
+      if (bookshelfDL) bookshelfDL.innerHTML = '';
+      if (shelfDL) shelfDL.innerHTML = '';
+      // sort libraries by 'order' if set for stable ordering
+      const libEntries = Object.entries(libs || {}).sort(([,a],[,b]) => (Number(a.order)||0) - (Number(b.order)||0));
+      libEntries.forEach(([libId, lib], libIndex) => {
+        const box = document.createElement('div');
+        box.className = 'library-card';
+        box.style.animationDelay = `${libIndex * 60}ms`;
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;" class="lib-header">
+            <span class="lib-left" style="display:flex;align-items:center;gap:8px"><span class="drag-handle" data-drag="lib" title="Taşı"><i class="fas fa-grip-lines"></i></span><strong>${lib.name}</strong></span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-success" data-lib="${libId}" data-action="add-to-lib">Kitap Ekle</button>
+              <button class="btn btn-secondary" data-lib="${libId}" data-action="edit-lib">Düzenle</button>
+              <button class="btn btn-danger" data-lib="${libId}" data-action="del-lib">Sil</button>
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <input placeholder="Yeni raf adı" data-lib-input="${libId}" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card)" />
+              <button class="btn btn-primary" data-lib="${libId}" data-action="add-shelf">Raf Ekle</button>
+            </div>
+            <div class="shelves-list" style="display:flex;flex-direction:column;gap:12px;">
+            </div>
+          </div>
+        `;
+
+        // add drag handle behavior for library reordering (drag only from handle)
+        box.dataset.lib = libId;
+        container.appendChild(box);
+        const libHandle = box.querySelector('.drag-handle[data-drag="lib"]');
+        if (libHandle) {
+          libHandle.draggable = true;
+          libHandle.addEventListener('dragstart', (ev) => {
+              try {
+                startDrag();
+                window.__currentDrag = { type: 'lib', id: libId };
+                ev.dataTransfer.setData('text/plain', 'lib:'+libId);
+                ev.dataTransfer.effectAllowed = 'move';
+                box.classList.add('dragging-lib');
+                // shrink all library cards to make vertical movement easier
+                if (container) container.classList.add('compact-while-dragging');
+                console.log('[dragstart][lib-handle]', { libId });
+              } catch (e) { console.error(e); }
+            });
+            libHandle.addEventListener('dragend', () => {
+              box.classList.remove('dragging-lib');
+              if (container) container.classList.remove('compact-while-dragging');
+              window.__currentDrag = null;
+              endDrag();
+              console.log('[dragend][lib-handle]', { libId });
+            });
+        }
+        
+
+        const shelvesList = box.querySelector('.shelves-list');
+        const shelves = (lib.shelves) || {};
+        // sort shelves by order
+        const shelfEntries = Object.entries(shelves || {}).sort(([,A],[,B]) => (Number(A.order)||0) - (Number(B.order)||0));
+        shelfEntries.forEach(([shelfId, shelf], shelfIndex) => {
+          const s = document.createElement('div');
+          s.className = 'shelf-card shelf-anim';
+          s.style.animationDelay = `${shelfIndex * 80}ms`;
+          s.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;"><span class="drag-handle" data-drag="shelf" title="Taşı"><i class="fas fa-grip-lines"></i></span><strong>${shelf.name}</strong></div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-success" data-lib="${libId}" data-shelf="${shelfId}" data-action="add-to-shelf">Kitap Ekle</button>
+                <button class="btn btn-secondary" data-lib="${libId}" data-shelf="${shelfId}" data-action="edit-shelf">Düzenle</button>
+                <button class="btn btn-danger" data-lib="${libId}" data-shelf="${shelfId}" data-action="del-shelf">Sil</button>
+              </div>
+            </div>
+            <div class="shelf-drop" data-lib="${libId}" data-shelf="${shelfId}"></div>
+          `;
+
+          // add drag handle behavior for shelf reordering (drag only from handle)
+          s.dataset.shelf = shelfId;
+          const shelfHandle = s.querySelector('.drag-handle[data-drag="shelf"]');
+          if (shelfHandle) {
+            shelfHandle.draggable = true;
+            shelfHandle.addEventListener('dragstart', (ev) => {
+              try {
+                startDrag();
+                window.__currentDrag = { type: 'shelf', libId: libId, shelfId: shelfId };
+                ev.dataTransfer.setData('text/plain', `shelf:${libId}:${shelfId}`);
+                ev.dataTransfer.effectAllowed = 'move';
+                // set a visible drag image (use the shelf card element) to keep drag alive
+                try { if (ev.dataTransfer && s) ev.dataTransfer.setDragImage(s, 12, 12); } catch (err) {}
+                s.classList.add('dragging-shelf');
+                // minimize shelves list while dragging a shelf to allow moving it past long pages
+                if (shelvesList) shelvesList.classList.add('compact-while-dragging');
+                console.log('[dragstart][shelf-handle] start', { libId, shelfId, x: ev.clientX, y: ev.clientY, time: Date.now() });
+                window.__dragInitiatedAt = Date.now();
+              } catch (e) { console.error(e); }
+            });
+            shelfHandle.addEventListener('dragend', (ev) => {
+              s.classList.remove('dragging-shelf');
+              if (shelvesList) shelvesList.classList.remove('compact-while-dragging');
+              console.log('[dragend][shelf-handle] end', { libId, shelfId, x: ev && ev.clientX, y: ev && ev.clientY, time: Date.now() });
+              window.__currentDrag = null;
+              endDrag();
+            });
+            // pointerdown fallback: start a pointer-driven reorder when DnD aborts
+            try {
+              shelfHandle.style.touchAction = shelfHandle.style.touchAction || 'none';
+              shelfHandle.addEventListener('pointerdown', (ev) => {
+                // only left-button primary interactions start reorder
+                if (ev.button && ev.button !== 0) return;
+                try { beginShelfPointerDrag(ev, libId, shelfId, s, shelvesList); } catch (e) { console.error('pointerdown shelf handle', e); }
+              });
+            } catch (e) { /* ignore pointer binding failures */ }
+          }
+
+          // wire library/shelf action buttons
+          // drag/drop events on the drop zone with insertion placeholder for ordering
+          const dropZone = s.querySelector('.shelf-drop');
+          const insertPlaceholder = document.createElement('div');
+          insertPlaceholder.className = 'book-insert-placeholder';
+          insertPlaceholder.style.width = '12px';
+          insertPlaceholder.style.height = '120px';
+          insertPlaceholder.style.display = 'inline-block';
+          insertPlaceholder.style.background = 'rgba(255,255,255,0.06)';
+          insertPlaceholder.style.borderRadius = '4px';
+          insertPlaceholder.style.marginRight = '6px';
+
+          dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            try { if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'; } catch (ee) {}
+            // Only allow book insertion visuals when a book is being dragged
+            const dragging = window.__currentDrag || null;
+            if (!dragging || dragging.type !== 'book') {
+              // clear placeholder if present and don't highlight
+              if (insertPlaceholder.parentElement === dropZone) insertPlaceholder.remove();
+              dropZone.style.background = '#0f172a';
+              return;
+            }
+            dropZone.style.background = 'rgba(79,70,229,0.03)';
+            // throttle shelf-dragover logs to make console readable
+            throttledLog('shelf-drop-' + libId + '-' + shelfId, ['[dragover][shelf-drop]', { libId, shelfId, x: e.clientX }], 140);
+            const x = e.clientX;
+            const children = Array.from(dropZone.querySelectorAll('.book-spine'));
+            let inserted = false;
+            for (const child of children) {
+              const r = child.getBoundingClientRect();
+              if (x < r.left + r.width / 2) {
+                if (insertPlaceholder.parentElement !== dropZone || insertPlaceholder.nextSibling !== child) dropZone.insertBefore(insertPlaceholder, child);
+                inserted = true;
+                break;
+              }
+            }
+            if (!inserted) {
+              if (insertPlaceholder.parentElement !== dropZone) dropZone.appendChild(insertPlaceholder);
+            }
+          });
+
+          dropZone.addEventListener('dragleave', () => { dropZone.style.background = '#0f172a'; if (insertPlaceholder.parentElement === dropZone) insertPlaceholder.remove(); });
+          // leave mouse wheel to the browser (do not intercept) so page scroll works when hovering shelves
+
+          
+
+          dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.background = 'linear-gradient(180deg,#0f172a,#0f172a)';
+            if (insertPlaceholder.parentElement !== dropZone) insertPlaceholder.remove();
+            // robustly read payload and log for diagnostics
+            const payload = (() => {
+              try { return (e.dataTransfer && (e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text'))) || ''; } catch (err) { try { return e.dataTransfer.getData('text'); } catch (e) { return ''; } }
+            })();
+            console.log('[drop][shelf]', { libId, shelfId, payload });
+            if (!payload) return;
+            const parsed = parseDragPayload(payload);
+            if (!parsed || parsed.type !== 'book') { console.log('[drop][shelf] ignored payload', parsed); return; } // only accept book drags here
+            const key = parsed.id;
+            try {
+              // compute prev/next by looking at placeholder neighbors reliably
+              const prevEl = insertPlaceholder.previousElementSibling && insertPlaceholder.previousElementSibling.classList.contains('book-spine') ? insertPlaceholder.previousElementSibling : null;
+              const nextEl = insertPlaceholder.nextElementSibling && insertPlaceholder.nextElementSibling.classList.contains('book-spine') ? insertPlaceholder.nextElementSibling : null;
+              const prev = prevEl ? prevEl.dataset.key : null;
+              const next = nextEl ? nextEl.dataset.key : null;
+              const prevOrder = prev && books[prev] ? Number(books[prev].order) : null;
+              const nextOrder = next && books[next] ? Number(books[next].order) : null;
+              console.log('[drop][shelf] neighbors', { prev, next, prevOrder, nextOrder });
+              let newOrder = computeOrderBetween(prevOrder, nextOrder);
+              if (newOrder == null) {
+                console.log('[drop][shelf] need reindex');
+                await reindexBooks(libId, shelfId);
+                await loadBooks();
+                // abort — UI will show updated ordering and user can retry
+                return;
+              }
+
+              await db.ref(`users/${currentUser.uid}/books/${key}`).update({ bookshelf: libId, shelf: shelfId, order: newOrder });
+              console.log('[drop][shelf] db.updated', { key, libId, shelfId, order: newOrder });
+              let spine = document.querySelector(`.book-spine[data-key="${key}"]`);
+              if (!spine) {
+                const b = books[key] || {};
+                spine = document.createElement('div');
+                spine.className = 'book-spine';
+                spine.title = b.title || '';
+                spine.dataset.key = key;
+                // Only the small grab handle is draggable; the spine itself is not.
+                spine.draggable = false;
+                spine.dataset.dndInit = '1';
+                if (b.cover) { const img = document.createElement('img'); img.className = 'shelf-cover'; img.src = b.cover; img.onerror = function() { this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23153e75%22 width=%2240%22 height=%2260%22/%3E%3C/text%3E%3C/svg%3E'; }; spine.appendChild(img); }
+                else { const t = document.createElement('div'); t.className = 'shelf-title'; const short = (books[key] && books[key].title || 'Kitap').slice(0,16); t.textContent = short + (((books[key] && books[key].title)||'').length>16?'…':''); spine.appendChild(t); }
+                const grab = document.createElement('div'); grab.className = 'spine-grab'; grab.title = 'Taşı'; grab.draggable = true; grab.innerHTML = '<i class="fas fa-grip-lines" style="font-size:10px"></i>'; grab.style.touchAction = 'none'; grab.addEventListener('pointerdown', (ev) => ev.stopPropagation && ev.stopPropagation());
+                spine.appendChild(grab);
+              } else {
+                try { if (spine.parentElement && spine.parentElement !== dropZone) spine.parentElement.removeChild(spine); } catch (e) {}
+              }
+              if (insertPlaceholder.parentElement === dropZone) dropZone.insertBefore(spine, insertPlaceholder);
+              else dropZone.appendChild(spine);
+              if (spine.parentElement && spine.parentElement === dropZone && insertPlaceholder.parentElement === dropZone) insertPlaceholder.remove();
+              if (books[key]) { books[key].bookshelf = libId; books[key].shelf = shelfId; books[key].order = newOrder; }
+              updateStats();
+            } catch (err) { console.error('Hareket hatası', err); }
+          });
+
+          // render book spines inside drop zone
+          const booksInShelf = Object.entries(books || {}).filter(([, b]) => b.bookshelf === libId && b.shelf === shelfId).sort(([,A],[,B]) => (Number(A.order)||0) - (Number(B.order)||0));
+          booksInShelf.forEach(([bk, b], idx) => {
+            const spine = document.createElement('div');
+            spine.className = 'book-spine';
+            spine.title = b.title || '';
+            spine.dataset.key = bk;
+            // Only the small grab handle is draggable; the spine itself is not.
+            spine.draggable = false;
+            // handlers are delegated globally; mark as initialized to avoid per-element wiring
+            spine.dataset.dndInit = '1';
+
+            // if book has a cover, show it; otherwise show a short title
+            if (b.cover) {
+              const img = document.createElement('img');
+              img.className = 'shelf-cover';
+              img.src = b.cover;
+              img.onerror = function() { this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23153e75%22 width=%2240%22 height=%2260%22/%3E%3C/text%3E%3C/svg%3E'; };
+              spine.appendChild(img);
+            } else {
+              const t = document.createElement('div');
+              t.className = 'shelf-title';
+              const short = (b.title || 'Kitap').slice(0, 16);
+              t.textContent = short + (b.title && b.title.length > 16 ? '…' : '');
+              spine.appendChild(t);
+            }
+
+            const grab = document.createElement('div');
+            grab.className = 'spine-grab';
+            grab.title = 'Taşı';
+            grab.draggable = true;
+            grab.innerHTML = '<i class="fas fa-grip-lines" style="font-size:10px"></i>';
+            // prevent pointer events from bubbling to parent which may trigger shelf interactions
+            grab.style.touchAction = 'none';
+            grab.addEventListener('pointerdown', (ev) => ev.stopPropagation && ev.stopPropagation());
+            spine.appendChild(grab);
+
+            dropZone.appendChild(spine);
+          });
+          // append shelf element to the shelves list so it becomes visible
+          if (shelvesList) shelvesList.appendChild(s);
+        });
+
+        // allow reordering shelves within this library by dragging shelf cards
+        // Candidate/highlight approach — only active for shelf drags
+        shelvesList.__insertCandidate = null;
+        shelvesList.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const dragging = window.__currentDrag || null;
+          // only show shelf reorder hints when dragging a shelf
+          if (!dragging || dragging.type !== 'shelf') {
+            Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+            shelvesList.__insertCandidate = null;
+            return;
+          }
+          // debug: show dragging info and candidate computing
+          try { console.log('[dragover][shelves-list]', { dragging, clientY: e.clientY }); } catch (err) {}
+          const y = e.clientY;
+          const children = Array.from(shelvesList.querySelectorAll('.shelf-card'));
+          let candidate = null;
+          let candidateIndex = children.length;
+          for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const r = child.getBoundingClientRect();
+            if (y < r.top + r.height / 2) { candidate = child; candidateIndex = i; break; }
+          }
+          try { console.log('[dragover][shelves-list] candidate', { libId, shelfIdBeingDragged: (window.__currentDrag && window.__currentDrag.shelfId), candidateIndex, total: children.length }); } catch (e) {}
+          // clear previous highlights
+          children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+          if (candidate) {
+            candidate.classList.add('insert-before');
+            shelvesList.__insertCandidate = { before: candidate };
+          } else {
+            if (children.length) children[children.length-1].classList.add('insert-after');
+            shelvesList.__insertCandidate = { before: null };
+          }
+        });
+        shelvesList.addEventListener('dragleave', () => { Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); shelvesList.__insertCandidate = null; });
+
+        shelvesList.addEventListener('drop', async (e) => {
+          e.preventDefault(); e.stopPropagation();
+          const payload = (() => { try { return (e.dataTransfer && (e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text'))) || ''; } catch (err) { try { return e.dataTransfer.getData('text'); } catch (e) { return ''; } } })();
+          console.log('[drop][shelves-list] payload', payload);
+          if (!payload) { shelvesList.__insertCandidate = null; return; }
+          const parsed = parseDragPayload(payload);
+          console.log('[drop][shelves-list] parsed', parsed);
+          if (!parsed || parsed.type !== 'shelf') { shelvesList.__insertCandidate = null; Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); return; }
+          const srcLib = parsed.libId; const srcShelf = parsed.shelfId;
+          console.log('[drop][shelves-list] src', { srcLib, srcShelf, libId });
+          if (srcLib !== libId) { shelvesList.__insertCandidate = null; Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); return; }
+          try {
+              // determine insert index reliably using the current list of shelf elements
+              const children2 = Array.from(shelvesList.querySelectorAll('.shelf-card'));
+              let insertIndex = children2.length; // default append
+              if (shelvesList.__insertCandidate && shelvesList.__insertCandidate.before) {
+                insertIndex = children2.indexOf(shelvesList.__insertCandidate.before);
+                if (insertIndex === -1) insertIndex = children2.length;
+              }
+
+              const prevEl = insertIndex > 0 ? children2[insertIndex - 1] : null;
+              const nextEl = insertIndex < children2.length ? children2[insertIndex] : null;
+              const prevId = prevEl ? prevEl.dataset.shelf : null;
+              const nextId = nextEl ? nextEl.dataset.shelf : null;
+
+              const prevOrder = prevId && libs[libId] && libs[libId].shelves && libs[libId].shelves[prevId] ? Number(libs[libId].shelves[prevId].order) : null;
+              const nextOrder = nextId && libs[libId] && libs[libId].shelves && libs[libId].shelves[nextId] ? Number(libs[libId].shelves[nextId].order) : null;
+              console.log('[drop][shelves-list] insertIndex', { insertIndex, prevId, nextId, prevOrder, nextOrder });
+              let newOrder = computeOrderBetween(prevOrder, nextOrder);
+              if (newOrder == null) {
+                // reindex and reload to create gaps, then abort — user will see updated order next render
+                console.log('[drop][shelves-list] reindex needed');
+                await reindexShelves(libId);
+                await loadLibraries();
+                shelvesList.__insertCandidate = null;
+                Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+                return;
+              }
+              console.log('[drop][shelves-list] newOrder computed', { newOrder });
+              await db.ref(`users/${currentUser.uid}/libs/${libId}/shelves/${srcShelf}/order`).set(newOrder);
+              console.log('[drop][shelves-list] db.write done', { srcShelf, newOrder });
+              await loadLibraries();
+            } catch (err) { console.error('Raf sıralama hatası', err); }
+          shelvesList.__insertCandidate = null;
+          Array.from(shelvesList.querySelectorAll('.shelf-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+        });
+
+        // allow dropping directly on library to move book into library without shelf
+        // Library-level drops intentionally disabled — only shelf drops change book location.
+        // This ensures dropping onto the library area does nothing (no shelf clearing).
+      });
+
+      // allow reordering libraries by dragging library cards
+      // allow reordering libraries by dragging library cards (candidate/highlight approach)
+      container.__insertCandidate = null;
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const dragging = window.__currentDrag || null;
+        // only react to library drags
+        if (!dragging || dragging.type !== 'lib') {
+          Array.from(container.querySelectorAll('.library-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+          container.__insertCandidate = null;
+          return;
+        }
+        const y = e.clientY;
+        const children = Array.from(container.querySelectorAll('.library-card'));
+        let candidate = null;
+        for (const child of children) {
+          const r = child.getBoundingClientRect();
+          if (y < r.top + r.height / 2) { candidate = child; break; }
+        }
+        children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+        if (candidate) { candidate.classList.add('insert-before'); container.__insertCandidate = { before: candidate }; }
+        else { if (children.length) children[children.length-1].classList.add('insert-after'); container.__insertCandidate = { before: null }; }
+      });
+      container.addEventListener('dragleave', () => { Array.from(container.querySelectorAll('.library-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); container.__insertCandidate = null; });
+      container.addEventListener('drop', async (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const payload = (() => { try { return (e.dataTransfer && (e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text'))) || ''; } catch (err) { try { return e.dataTransfer.getData('text'); } catch (e) { return ''; } } })();
+        if (!payload) { container.__insertCandidate = null; return; }
+        const parsed = parseDragPayload(payload);
+        if (!parsed || parsed.type !== 'lib') { container.__insertCandidate = null; Array.from(container.querySelectorAll('.library-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); return; }
+        const srcLib = parsed.id;
+        try {
+          // compute insert position using stable children ordering
+          const children = Array.from(container.querySelectorAll('.library-card'));
+          let insertIndex = children.length;
+          if (container.__insertCandidate && container.__insertCandidate.before) {
+            insertIndex = children.indexOf(container.__insertCandidate.before);
+            if (insertIndex === -1) insertIndex = children.length;
+          }
+          const prevEl = insertIndex > 0 ? children[insertIndex - 1] : null;
+          const nextEl = insertIndex < children.length ? children[insertIndex] : null;
+          const prevId = prevEl ? prevEl.dataset.lib : null;
+          const nextId = nextEl ? nextEl.dataset.lib : null;
+          const prevOrder = prevId && libs[prevId] ? Number(libs[prevId].order) : null;
+          const nextOrder = nextId && libs[nextId] ? Number(libs[nextId].order) : null;
+          let newOrder = computeOrderBetween(prevOrder, nextOrder);
+          if (newOrder == null) {
+            await reindexLibraries();
+            await loadLibraries();
+            container.__insertCandidate = null;
+            Array.from(container.querySelectorAll('.library-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+            return;
+          }
+          await db.ref(`users/${currentUser.uid}/libs/${srcLib}/order`).set(newOrder);
+          await loadLibraries();
+        } catch (err) { console.error('Kitaplık sıralama hatası', err); }
+        container.__insertCandidate = null;
+        Array.from(container.querySelectorAll('.library-card')).forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+      });
+
+      // wire library/shelf action buttons
+      container.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const action = btn.dataset.action;
+          const libId = btn.dataset.lib;
+          const shelfId = btn.dataset.shelf;
+          if (action === 'add-to-lib') {
+            // show chooser to pick existing book or create new
+            const libNameLocal = (libs[libId] && libs[libId].name) || '';
+            showAddChooser(libId, '', libNameLocal, '');
+            return;
+          }
+          if (action === 'add-to-shelf') {
+            // show chooser for specific shelf
+            const libNameLocal = (libs[libId] && libs[libId].name) || '';
+            const shelfNameLocal = (libs[libId] && libs[libId].shelves && libs[libId].shelves[shelfId] && libs[libId].shelves[shelfId].name) || '';
+            showAddChooser(libId, shelfId, libNameLocal, shelfNameLocal);
+            return;
+          }
+          if (action === 'edit-lib') {
+            const name = prompt('Yeni kitaplık adı:', (libs[libId] && libs[libId].name) || '');
+            if (!name) return;
+            await db.ref(`users/${currentUser.uid}/libs/${libId}/name`).set(name);
+            loadLibraries();
+          }
+          if (action === 'del-lib') {
+            const libName = (libs[libId] && libs[libId].name) || '';
+            const confirmation = prompt(`'${libName}' adlı kitaplığı KALICI olarak silmek istiyor musunuz? Onaylamak için kitaplık adını yazın:`);
+            if (!confirmation || confirmation.trim() !== libName) {
+              alert('Silme işlemi iptal edildi. Tam ad girilmedi.');
+              return;
+            }
+            try {
+              // Batch-update books to clear bookshelf/shelf fields to avoid partial writes
+              const updates = {};
+              Object.entries(books || {}).forEach(([bk, b]) => { if (b && b.bookshelf === libId) { updates[`/users/${currentUser.uid}/books/${bk}/bookshelf`] = ''; updates[`/users/${currentUser.uid}/books/${bk}/shelf`] = ''; } });
+              if (Object.keys(updates).length > 0) await db.ref().update(updates);
+              await db.ref(`users/${currentUser.uid}/libs/${libId}`).remove();
+              await loadBooks(); await loadLibraries();
+            } catch (err) { console.error('Silme hatası', err); alert('Kitaplık silinemedi: ' + (err.message || err)); }
+          }
+          if (action === 'add-shelf') {
+            const input = container.querySelector(`[data-lib-input="${libId}"]`);
+            const name = input && input.value.trim();
+            if (!name) return alert('Raf adı girin');
+            const newShelfRef = db.ref(`users/${currentUser.uid}/libs/${libId}/shelves`).push();
+            await newShelfRef.set({ name });
+            input.value = '';
+            loadLibraries();
+          }
+          if (action === 'edit-shelf') {
+            const newName = prompt('Yeni raf adı:', (libs[libId].shelves && libs[libId].shelves[shelfId] && libs[libId].shelves[shelfId].name) || '');
+            if (!newName) return;
+            await db.ref(`users/${currentUser.uid}/libs/${libId}/shelves/${shelfId}/name`).set(newName);
+            loadLibraries();
+          }
+          if (action === 'del-shelf') {
+            const shelfName = (libs[libId] && libs[libId].shelves && libs[libId].shelves[shelfId] && libs[libId].shelves[shelfId].name) || '';
+            const confirmation = prompt(`'${shelfName}' rafını KALICI olarak silmek istiyor musunuz? Onaylamak için raf adını yazın:`);
+            if (!confirmation || confirmation.trim() !== shelfName) { alert('Silme işlemi iptal edildi. Tam ad girilmedi.'); return; }
+            try {
+              const updates = {};
+              Object.entries(books || {}).forEach(([bk, b]) => { if (b && b.bookshelf === libId && b.shelf === shelfId) { updates[`/users/${currentUser.uid}/books/${bk}/shelf`] = ''; } });
+              if (Object.keys(updates).length > 0) await db.ref().update(updates);
+              await db.ref(`users/${currentUser.uid}/libs/${libId}/shelves/${shelfId}`).remove();
+              await loadBooks(); await loadLibraries();
+            } catch (err) { console.error('Raf silme hatası', err); alert('Raf silinemedi: ' + (err.message || err)); }
+          }
+        });
+      });
+
+      // populate bookshelf datalist options
+      Object.entries(libs || {}).forEach(([libId, lib]) => {
+        if (bookshelfDL) {
+          const o = document.createElement('option'); o.value = lib.name || ''; bookshelfDL.appendChild(o);
+        }
+        const shelves = (lib.shelves) || {};
+        Object.entries(shelves).forEach(([shelfId, shelf]) => {
+          if (shelfDL) {
+            const so = document.createElement('option'); so.value = shelf.name || ''; shelfDL.appendChild(so);
+          }
+        });
+      });
+      // decorate library buttons
+      applyButtonIcons(container);
+    }
+
+    // Auto-scroll and verbose debugging while dragging near viewport edges
+    try {
+      if (!window.__globalDragHandlerInstalled) {
+        window.__globalDragHandlerInstalled = true;
+        // keep a small timestamp to avoid continuous scrolling spams
+        window.__lastAutoScroll = 0;
+        document.addEventListener('dragover', (e) => {
+          const dragging = window.__currentDrag || null;
+          if (!dragging) return;
+          // Throttled concise logging to avoid giant console dumps
+          throttledLog('global', ['[dragover][global]', { type: dragging.type, info: dragging.id || dragging.libId || dragging.shelfId || null, x: e.clientX, y: e.clientY }], 160);
+          const margin = 80;
+          const now = Date.now();
+          // throttle actual autoscroll to ~80ms intervals
+          if (now - (window.__lastAutoScroll || 0) > 80) {
+            window.__lastAutoScroll = now;
+            // for large moves (libraries/shelves) scroll page vertically
+            if (dragging.type === 'lib' || dragging.type === 'shelf') {
+              if (e.clientY < margin) window.scrollBy(0, -40);
+              else if (e.clientY > window.innerHeight - margin) window.scrollBy(0, 40);
+            }
+            // for book drags, allow gentle scrolling too
+            if (dragging.type === 'book') {
+              if (e.clientY < margin) window.scrollBy(0, -30);
+              else if (e.clientY > window.innerHeight - margin) window.scrollBy(0, 30);
+            }
+          }
+        }, { passive: true });
+      }
+    } catch (e) { /* ignore */ }
+
+    // Install delegated dragstart/dragend handlers for book spines to avoid per-element duplicates
+    try {
+      if (!window.__bookDelegationInstalled) {
+        window.__bookDelegationInstalled = true;
+        document.addEventListener('dragstart', (e) => {
+          const target = e.target;
+          // Only initiate a book drag if the drag was started from the small grab handle
+          const grab = target && (target.classList && target.classList.contains('spine-grab') ? target : (target.closest ? target.closest('.spine-grab') : null));
+          if (!grab) return; // ignore drags that didn't originate on the handle
+          const spine = grab.closest ? grab.closest('.book-spine') : null;
+          if (!spine) return;
+          // clear any pending long-press timers (mouse emulation)
+          try {
+            if (window.__bookLongPressTimers) {
+              Object.keys(window.__bookLongPressTimers).forEach(k => { try { clearTimeout(window.__bookLongPressTimers[k]); } catch (e) {} });
+              window.__bookLongPressTimers = {};
+            }
+          } catch (e) { /* ignore */ }
+          try {
+            const key = spine.dataset.key;
+            startDrag();
+            window.__currentDrag = { type: 'book', id: key };
+            createSrcPlaceholder(spine);
+            if (e.dataTransfer) {
+              try { e.dataTransfer.setData('text/plain', 'book:' + key); } catch (err) {}
+              try { e.dataTransfer.effectAllowed = 'move'; } catch (err) {}
+            }
+            spine.classList.add('dragging');
+            // log compactly with event details
+            throttledLog('dragstart-spine', ['[dragstart][spine-grab]', { key, title: spine.title, parent: spine.parentElement && spine.parentElement.className, buttons: e.buttons, x: e.clientX, y: e.clientY }], 120);
+            const imgEl = spine.querySelector('img.shelf-cover');
+            if (imgEl && e.dataTransfer && e.dataTransfer.setDragImage) {
+              try { e.dataTransfer.setDragImage(imgEl, 20, 20); } catch (err) {}
+            }
+            // detect if drag ends very quickly (likely an abort)
+            window.__dragStartedAt = Date.now();
+            setTimeout(() => {
+              if (!window.__currentDrag || window.__currentDrag.id !== key) {
+                console.warn('[dragstart][spine-grab] aborted quickly', { key, sinceMs: Date.now() - window.__dragStartedAt });
+              }
+            }, 140);
+          } catch (err) { /* ignore */ }
+        });
+
+        document.addEventListener('dragend', (e) => {
+          const target = e.target;
+          // only handle dragend for drags started via the grab handle
+          const grab = target && (target.classList && target.classList.contains('spine-grab') ? target : (target.closest ? target.closest('.spine-grab') : null));
+          const spine = grab ? (grab.closest ? grab.closest('.book-spine') : null) : (target && (target.classList && target.classList.contains('book-spine') ? target : (target.closest ? target.closest('.book-spine') : null)));
+          if (!spine) return;
+          try {
+            spine.classList.remove('dragging');
+            removeSrcPlaceholder(spine);
+            const key = spine.dataset.key;
+            throttledLog('dragend-spine', ['[dragend][spine-grab]', { key, buttons: e.buttons, x: e.clientX, y: e.clientY, sinceStart: window.__dragStartedAt ? (Date.now()-window.__dragStartedAt) : null }], 160);
+            window.__currentDrag = null;
+            endDrag();
+          } catch (err) { /* ignore */ }
+        });
+      }
+    } catch (e) { /* ignore */ }
+
+    // Additional delegated logging to diagnose quick-abort drags
+    try {
+      if (!window.__dragDiagInstalled) {
+        window.__dragDiagInstalled = true;
+        document.addEventListener('pointerdown', (e) => {
+          // Only log pointer interactions that begin on the grab handle
+          const grab = e.target && (e.target.classList && e.target.classList.contains('spine-grab') ? e.target : (e.target.closest ? e.target.closest('.spine-grab') : null));
+          if (!grab) return;
+          const spine = grab.closest ? grab.closest('.book-spine') : null;
+          if (!spine) return;
+          console.log('[pointerdown][spine-grab]', { key: spine.dataset.key, buttons: e.buttons, x: e.clientX, y: e.clientY, time: Date.now() });
+        }, true);
+
+        document.addEventListener('pointerup', (e) => {
+          const grab = e.target && (e.target.classList && e.target.classList.contains('spine-grab') ? e.target : (e.target.closest ? e.target.closest('.spine-grab') : null));
+          if (!grab) return;
+          const spine = grab.closest ? grab.closest('.book-spine') : null;
+          if (!spine) return;
+          console.log('[pointerup][spine-grab]', { key: spine.dataset.key, buttons: e.buttons, x: e.clientX, y: e.clientY, time: Date.now() });
+        }, true);
+
+        document.addEventListener('mousedown', (e) => {
+          const grab = e.target && (e.target.classList && e.target.classList.contains('spine-grab') ? e.target : (e.target.closest ? e.target.closest('.spine-grab') : null));
+          if (!grab) return;
+          const spine = grab.closest ? grab.closest('.book-spine') : null;
+          if (!spine) return;
+          console.log('[mousedown][spine-grab]', { key: spine.dataset.key, buttons: e.buttons, x: e.clientX, y: e.clientY, time: Date.now() });
+        }, true);
+
+        document.addEventListener('mouseup', (e) => {
+          const grab = e.target && (e.target.classList && e.target.classList.contains('spine-grab') ? e.target : (e.target.closest ? e.target.closest('.spine-grab') : null));
+          if (!grab) return;
+          const spine = grab.closest ? grab.closest('.book-spine') : null;
+          if (!spine) return;
+          console.log('[mouseup][spine-grab]', { key: spine.dataset.key, buttons: e.buttons, x: e.clientX, y: e.clientY, time: Date.now() });
+        }, true);
+
+        // monitor drag progress events (fires while dragging)
+        document.addEventListener('drag', (e) => {
+          const target = e.target;
+          const spine = target && (target.classList && target.classList.contains('book-spine') ? target : (target.closest ? target.closest('.book-spine') : null));
+          if (!spine) return;
+          throttledLog('drag-progress', ['[drag][spine]', { key: spine.dataset.key, x: e.clientX, y: e.clientY }], 180);
+        }, true);
+        document.addEventListener('dragenter', (e) => {
+          const t = e.target && (e.target.classList && e.target.classList.contains('book-spine') ? e.target : (e.target.closest ? e.target.closest('.book-spine') : null));
+          throttledLog('dragenter', ['[dragenter]', { target: (t && t.dataset && t.dataset.key) || (e.target && e.target.className), x: e.clientX, y: e.clientY }], 200);
+        }, true);
+        document.addEventListener('dragleave', (e) => {
+          throttledLog('dragleave', ['[dragleave]', { target: e.target && e.target.className, x: e.clientX, y: e.clientY }], 200);
+        }, true);
+        document.addEventListener('dragover', (e) => {
+          throttledLog('dragover-debug', ['[dragover][debug]', { target: e.target && e.target.className, x: e.clientX, y: e.clientY }], 220);
+        }, true);
+        document.addEventListener('dragcancel', (e) => {
+          console.warn('[dragcancel] event observed', e);
+        }, true);
+        document.addEventListener('pointercancel', (e) => {
+          const spine = e.target && (e.target.classList && e.target.classList.contains('book-spine') ? e.target : (e.target.closest ? e.target.closest('.book-spine') : null));
+          if (spine) console.warn('[pointercancel][spine]', { key: spine.dataset.key, x: e.clientX, y: e.clientY });
+        }, true);
+      }
+    } catch (e) { /* ignore */ }
+
+    // Add library helper
+    async function addLibrary(name) {
+      if (!currentUser) return;
+      const ref = db.ref(`users/${currentUser.uid}/libs`).push();
+      await ref.set({ name, shelves: {} });
+      await loadLibraries();
+    }
+
+
+    function showSkeleton() { /* removed skeleton overlay — no-op */ }
+
+    function hideSkeleton() { /* removed skeleton overlay — no-op */ }
 
     function renderBooks() {
       const booksList = document.getElementById('books-list');
       booksList.innerHTML = '';
-      Object.entries(books).forEach(([key, book], index) => {
+
+      // Prepare entries and sort according to the selected sort option
+      const entries = Object.entries(books || {});
+      const sortEl = document.getElementById('sort-select');
+      const sortType = sortEl ? sortEl.value : 'dateDesc';
+      entries.sort(([, a], [, b]) => {
+        if (sortType === 'dateDesc') return new Date(b.addDate || 0) - new Date(a.addDate || 0);
+        if (sortType === 'dateAsc') return new Date(a.addDate || 0) - new Date(b.addDate || 0);
+        if (sortType === 'alphaAsc') return (a.title || '').localeCompare(b.title || '');
+        if (sortType === 'alphaDesc') return (b.title || '').localeCompare(a.title || '');
+        if (sortType === 'pagesDesc') return (b.pagesRead || 0) - (a.pagesRead || 0);
+        return 0;
+      });
+
+      entries.forEach(([key, book], index) => {
         const percent = book.totalPages ? Math.round((book.pagesRead / book.totalPages) * 100) : 0;
         const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22225%22%3E%3Crect fill=%22%23667eea%22 width=%22150%22 height=%22225%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EKitap%3C/text%3E%3C/svg%3E';
         
         const card = document.createElement('div');
         card.className = `book-card ${compactView ? 'compact' : ''}`;
         card.style.animationDelay = `${index * 0.1}s`;
+        // Resolve human-readable location names (rooms, libraries, shelves)
+        const resolveRoom = (r) => {
+          if (!r) return '-';
+          // if r is an id in roomsMap
+          if (roomsMap && roomsMap[r] && roomsMap[r].name) return roomsMap[r].name;
+          // else try find by name
+          for (const id of Object.keys(roomsMap || {})) { if (roomsMap[id] && roomsMap[id].name === r) return r; }
+          return r || '-';
+        };
+        const resolveLib = (libVal) => {
+          if (!libVal) return '-';
+          if (libraries && libraries[libVal] && libraries[libVal].name) return libraries[libVal].name;
+          // try find lib by name
+          for (const id of Object.keys(libraries || {})) { if (libraries[id] && libraries[id].name === libVal) return libraries[id].name; }
+          return libVal || '-';
+        };
+        const resolveShelf = (libVal, shelfVal) => {
+          if (!shelfVal) return '-';
+          // if libVal is an id and shelfVal is an id under it
+          if (libraries && libraries[libVal] && libraries[libVal].shelves && libraries[libVal].shelves[shelfVal] && libraries[libVal].shelves[shelfVal].name) return libraries[libVal].shelves[shelfVal].name;
+          // if shelfVal is a name, return it
+          if (typeof shelfVal === 'string') return shelfVal;
+          return shelfVal || '-';
+        };
+
+        const roomLabel = resolveRoom(book.room);
+        const libLabel = resolveLib(book.bookshelf);
+        const shelfLabel = resolveShelf(book.bookshelf, book.shelf);
+
         card.innerHTML = `
           <img src="${book.cover || placeholder}" alt="cover" class="book-cover" onerror="this.src='${placeholder}'" />
           <div class="book-info">
@@ -1209,16 +2887,30 @@
               <div class="book-progress-bar" style="width: ${percent}%"></div>
             </div>
             <div class="book-stats">${book.pagesRead}/${book.totalPages} sayfa (${percent}%)</div>
-            <div class="book-location">📍 ${book.room || '-'} / ${book.bookshelf || '-'} / ${book.shelf || '-'}</div>
+            <div class="book-location">📍 ${roomLabel} / ${libLabel} / ${shelfLabel}</div>
             <div class="book-actions">
               <button class="btn btn-primary" onclick="editBook('${key}')">Düzenle</button>
               <button class="btn btn-danger" onclick="deleteBook('${key}')">Sil</button>
             </div>
           </div>
         `;
+        // make draggable so user can move books between shelves
+        card.draggable = true;
+        card.dataset.key = key;
+            card.addEventListener('dragstart', (ev) => {
+              try {
+                startDrag(); window.__currentDrag = { type: 'book', id: key };
+                ev.dataTransfer.setData('text/plain', 'book:'+key);
+                ev.dataTransfer.effectAllowed = 'move';
+              } catch (e) {}
+              try { console.log('[dragstart][card]', { key, title: book.title, bookshelf: book.bookshelf || null, shelf: book.shelf || null }); } catch (e) {}
+            });
+            card.addEventListener('dragend', () => { window.__currentDrag = null; endDrag(); });
         booksList.appendChild(card);
         setTimeout(() => card.classList.add('animate'), 50);
       });
+      // add icons to dynamically created buttons in book cards
+      applyButtonIcons(booksList);
     }
 
     function updateStats() {
@@ -1237,20 +2929,47 @@
       const book = books[key];
       if (!book) return;
       editingKey = key;
-      const inputs = document.getElementById('book-form').querySelectorAll('input, textarea');
-      inputs[0].value = book.title || '';
-      inputs[1].value = book.author || '';
-      inputs[2].value = book.publisher || '';
-      inputs[3].value = book.publishedDate || '';
-      inputs[4].value = book.totalPages || '';
-      inputs[5].value = book.pagesRead || '';
-      inputs[6].value = book.addDate || '';
-      inputs[7].value = book.finishDate || '';
-      inputs[8].value = book.room || '';
-      inputs[9].value = book.bookshelf || '';
-      inputs[10].value = book.shelf || '';
-      inputs[11].value = book.cover || '';
-      inputs[12].value = book.note || '';
+      // fill known fields by id
+      const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      setIf('f-title', book.title || '');
+      setIf('f-author', book.author || '');
+      setIf('f-publisher', book.publisher || '');
+      setIf('f-publishedDate', book.publishedDate || '');
+      setIf('f-totalPages', book.totalPages || '');
+      setIf('f-pagesRead', book.pagesRead || '');
+      setIf('f-addDate', book.addDate || '');
+      setIf('f-finishDate', book.finishDate || '');
+      setIf('f-room', book.room || '');
+      setIf('f-cover', book.cover || '');
+      setIf('f-note', book.note || '');
+
+      // Resolve bookshelf/shelf: if stored value is an ID, look up names
+      try {
+        const libsSnap = await db.ref(`users/${currentUser.uid}/libs`).once('value');
+        const libs = libsSnap.val() || {};
+        let shelfName = '';
+        let libName = '';
+        if (book.bookshelf && libs[book.bookshelf]) {
+          libName = libs[book.bookshelf].name || '';
+          // find shelf name if shelf is id
+          if (book.shelf && libs[book.bookshelf].shelves && libs[book.bookshelf].shelves[book.shelf]) {
+            shelfName = libs[book.bookshelf].shelves[book.shelf].name || '';
+          } else if (typeof book.shelf === 'string') {
+            shelfName = book.shelf;
+          }
+        } else {
+          // maybe books stored names instead of ids
+          libName = book.bookshelf || '';
+          shelfName = book.shelf || '';
+        }
+        setIf('f-bookshelf', libName);
+        setIf('f-shelf', shelfName);
+      } catch (err) {
+        // fallback to raw values
+        setIf('f-bookshelf', book.bookshelf || '');
+        setIf('f-shelf', book.shelf || '');
+      }
+
       document.getElementById('add-modal').classList.add('active');
     };
 
@@ -1323,8 +3042,24 @@
         const data = await response.json();
 
         searchResults.innerHTML = '';
-        if (!data.items) {
-          searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">Kitap bulunamadı</div>';
+          if (!data.items || data.items.length === 0) {
+          // Show helpful UI: allow creating a new book from the query
+          searchResults.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+              Kitap bulunamadı
+              <div style="margin-top:12px">
+                <button id="create-from-search" class="btn btn-success">Yeni Kitap Oluştur</button>
+              </div>
+            </div>
+          `;
+          const createBtn = document.getElementById('create-from-search');
+          if (createBtn) createBtn.addEventListener('click', () => {
+            // open add modal and prefill title with the query
+            const titleEl = document.getElementById('f-title');
+            if (titleEl) titleEl.value = query || '';
+            searchResults.classList.remove('show');
+            modal.classList.add('active');
+          });
           return;
         }
 
@@ -1344,13 +3079,14 @@
           `;
 
           div.addEventListener('click', () => {
-            const inputs = document.getElementById('book-form').querySelectorAll('input, textarea');
-            inputs[0].value = info.title || '';
-            inputs[1].value = (info.authors || []).join(', ');
-            inputs[2].value = info.publisher || '';
-            inputs[3].value = info.publishedDate || '';
-            inputs[4].value = info.pageCount || '';
-            inputs[11].value = info.imageLinks?.thumbnail || '';
+            // fill form elements by id (keeps predictable ordering for user)
+            const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setIf('f-title', info.title || '');
+            setIf('f-author', (info.authors || []).join(', '));
+            setIf('f-publisher', info.publisher || '');
+            setIf('f-publishedDate', info.publishedDate || '');
+            setIf('f-totalPages', info.pageCount || '');
+            setIf('f-cover', info.imageLinks?.thumbnail || '');
 
             searchResults.classList.remove('show');
             document.getElementById('search-input').value = '';
@@ -1363,6 +3099,72 @@
         console.error('Arama hatası:', err);
         searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">Arama başarısız oldu</div>';
       }
+    }
+
+    // Show chooser overlay to select an existing book to add to a library/shelf
+    function showAddChooser(libId, shelfId, libName = '', shelfName = '') {
+      // remove existing chooser if any
+      const existing = document.getElementById('add-chooser-overlay');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'add-chooser-overlay';
+      overlay.className = 'add-chooser-overlay';
+      overlay.innerHTML = `
+        <div class="add-chooser">
+          <h3>Kitap Ekle</h3>
+          <div class="list" id="chooser-list"></div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="chooser-cancel">İptal</button>
+            <button class="btn btn-primary" id="chooser-new">Yeni Kitap Oluştur</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const list = document.getElementById('chooser-list');
+      // list existing books (skip ones already in same lib/shelf optionally)
+      const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23153e75%22 width=%2240%22 height=%2260%22/%3E%3C/svg%3E';
+      Object.entries(books || {}).forEach(([key, b]) => {
+        const alreadyHere = (b.bookshelf === libId) && (shelfId ? b.shelf === shelfId : true);
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <img src="${b.cover || placeholder}" onerror="this.src='${placeholder}'" />
+          <div class="meta">
+            <div style="font-weight:600">${b.title || 'Bilinmiyor'}</div>
+            <div style="font-size:13px;opacity:0.9">${b.author || ''}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${alreadyHere ? '<span style="font-size:13px;color:rgba(255,255,255,0.85);margin-right:8px">Zaten burada</span>' : `<button class="btn btn-primary" data-key="${key}">Ekle</button>`}
+          </div>
+        `;
+        // when Ekle clicked, update book to target lib/shelf
+        const addBtn = item.querySelector('button');
+        if (addBtn) {
+          addBtn.addEventListener('click', async () => {
+            try {
+              await db.ref(`users/${currentUser.uid}/books/${key}`).update({ bookshelf: libId || '', shelf: shelfId || '' });
+              overlay.remove();
+              await loadBooks();
+              await loadLibraries();
+            } catch (err) { alert('Hata: ' + err.message); }
+          });
+        }
+        list.appendChild(item);
+      });
+
+      document.getElementById('chooser-cancel').addEventListener('click', () => overlay.remove());
+      document.getElementById('chooser-new').addEventListener('click', () => {
+        // open add modal prefilled with provided lib/shelf names
+        if (document.getElementById('f-bookshelf')) document.getElementById('f-bookshelf').value = libName || '';
+        if (document.getElementById('f-shelf')) document.getElementById('f-shelf').value = shelfName || '';
+        editingKey = null;
+        overlay.remove();
+        const mf = document.getElementById('add-modal'); if (mf) mf.classList.add('active');
+      });
+      // add icons inside chooser
+      applyButtonIcons(overlay);
     }
   </script>
 </body>
