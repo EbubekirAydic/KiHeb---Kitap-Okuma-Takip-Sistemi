@@ -48,7 +48,7 @@ header p{margin:0;font-size:12px;color:var(--muted)}
 
 /* Modal */
 .modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.45);align-items:center;justify-content:center;padding:12px}
-.modal .modal-content{background:linear-gradient(180deg,#0f172a,#071032);padding:14px;border-radius:var(--radius-md);color:#fff;min-width:240px;max-width:520px}
+.modal .modal-content{background:linear-gradient(180deg,#0f172a,#071032);border-radius:var(--radius-md);color:#fff;min-width:240px;max-width:520px}
 
 /* Inputs / selects / textareas use card background and subtle border */
 input, select, textarea { background: var(--card); border: 1px solid rgba(2,6,23,0.06); color: var(--text, #0f172a); padding:8px; border-radius:8px }

@@ -82,7 +82,19 @@
       animation: slideDown 0.4s ease-out;
     }
 
-    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    /* Clean, responsive header layout */
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: nowrap; }
+    .header-title { display:flex; flex-direction:column; gap:2px; min-width: 0; }
+    .header-title h1 { font-size: 18px; margin:0; }
+    .search-wrapper { flex: 1 1 auto; min-width: 0; margin: 0 12px; }
+    .search-wrapper .search-bar { display:flex; align-items:center; gap:8px; }
+    .search-wrapper .search-bar input { flex:1; min-width:0; }
+    .header-actions { display:flex; gap:8px; align-items:center; }
+    .header-actions .btn { padding: 8px 10px; border-radius: 10px; }
+
+    /* When modal is open, hide header and mobile nav to reduce clutter */
+    body.modal-open header { display: none !important; }
+    body.modal-open #mobileBottomNav { display: none !important; }
     
     .header-title h1 {
       font-size: 18px;
@@ -97,16 +109,17 @@
     }
 
     .header-title p { font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0; }
-    .search-wrapper { position: relative; flex: 1; max-width: 400px; min-width: 200px; }
+    .search-wrapper { position: relative; flex: 1; /* max-width: 400px; */ min-width: 200px; }
     .search-bar { display: flex; gap: 8px; }
     
     .search-bar input {
       flex: 1;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 14px;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.06);
     }
 
     .search-bar input:focus {
@@ -117,6 +130,9 @@
     }
 
     .header-actions { display: flex; gap: 8px; }
+
+    /* Slightly larger header buttons and spacing for polish */
+    .header-actions .btn { padding: 10px; border-radius: 10px; }
 
     button {
       font-family: inherit;
@@ -409,7 +425,6 @@
     .modal-content {
       background: var(--card);
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      padding: 16px;
       width: 100%;
       animation: slideUp 0.3s ease;
       max-height: 90vh;
@@ -418,12 +433,40 @@
       flex-direction: column;
     }
 
+    /* Two-pane modal tweaks for add/edit 2.0 - make full-screen on all devices */
+    .modal.active { display: flex; }
+    .modal-content.two-pane { box-sizing: border-box; width: 100%; height: 100vh; max-width: none; max-height: none; margin: 0; border-radius: 0; display: flex; flex-direction: column; }
+    .modal-content.two-pane .left-pane { flex: 1 1 auto; overflow:auto; }
+    .modal-content.two-pane .right-pane { border-left: 1px solid var(--border); padding-left: 12px; overflow:auto; }
+    @media(min-width:880px) {
+      .modal-content.two-pane .left-pane { width: 60%; }
+      .modal-content.two-pane .right-pane { width: 40%; display: block; }
+    }
+
+    /* Right-pane preview mode: when a site is selected, expand iframe to fill the pane */
+    .modal-content.two-pane .right-pane.preview-active #modal-search-controls { display: none !important; }
+    .modal-content.two-pane .right-pane.preview-active #modal-search-results { display: none !important; }
+    .modal-content.two-pane .right-pane.preview-active #modal-search-webview-wrapper { display: flex !important; height: 100% !important; margin-top: 0 !important; }
+    .modal-content.two-pane .right-pane.preview-active #modal-search-webview { height: 100% !important; }
+    .modal-content.two-pane .right-pane.preview-active #modal-webview-closepane { display: block !important; }
+
+    /* Mobile-specific: stack panes and provide fullscreen preview overlay */
+    @media(max-width:880px) {
+      .modal-content.two-pane { padding: 12px; display:flex; flex-direction:column; }
+      .modal-content.two-pane .left-pane { width: 100%; }
+      .modal-content.two-pane .right-pane { position: fixed; inset: 0 0 0 0; width: 100%; height: 100%; background: var(--card); z-index: 1300; transform: translateY(100%); transition: transform 240ms ease; display:flex; flex-direction:column; padding: 12px; box-shadow: var(--shadow-lg); }
+      .modal-content.two-pane.mobile-preview-active .right-pane { transform: translateY(0); }
+      .modal-content.two-pane.mobile-preview-active .left-pane { display: none; }
+      .modal-content.two-pane .right-pane #modal-search-webview { height: 100% !important; }
+      .modal-content.two-pane .right-pane #modal-webview-closepane { display: block !important; position: absolute; top: 12px; right: 12px; z-index: 1400; }
+    }
+
     @media (min-width: 768px) {
-      .modal { align-items: center; justify-content: center; padding: 16px; }
+      .modal { align-items: center; justify-content: center; }
       .modal-content { border-radius: var(--radius-lg); width: 100%; max-width: 500px; animation: scaleIn 0.3s ease; }
     }
 
-    .modal-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header { font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
     
     .modal-close {
       background: none;
@@ -527,7 +570,7 @@
     .skeleton { background: linear-gradient(90deg,#eee,#f5f5f5); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
 
     /* Ensure modal important area sticks to top for readability */
-    .modal-important { position: sticky; top: 0; background: transparent; z-index: 2; padding-bottom:8px }
+    .modal-important { position: sticky; top: 0; background: transparent; z-index: 99; padding:8px }
 
     /* Libraries / Shelves visuals */
     /* Libraries / Shelves visuals (warm wood palette) */
@@ -548,7 +591,7 @@
     .library-card .lib-header { display:flex;align-items:center;justify-content:space-between;gap:8px }
 
     /* shelf: dark blue theme to match site */
-    .shelf-card { background: linear-gradient(180deg,#1e293b,#0f172a); border-radius:8px; padding:8px; color:#ffffff }
+    .shelf-card { border: 1px solid var(--border); background: linear-gradient(180deg,#1e293b,#0f172a); border-radius:8px; padding:8px; color:#ffffff }
 
     /* Fixed-height shelf so adding/removing spines doesn't change layout height */
     .shelf-drop { 
@@ -598,6 +641,35 @@
     .book-insert-placeholder { width:12px; height:120px; display:inline-block; background: rgba(255,255,255,0.04); border-radius:4px; margin-right:6px; }
     .shelf-card.insert-before, .shelf-card.insert-after { outline: 2px dashed rgba(255,255,255,0.06); }
     .library-card.insert-before, .library-card.insert-after { outline: 2px dashed rgba(255,255,255,0.06); }
+
+    /* Visible insertion bar used when reordering libraries */
+    .lib-insert-bar {
+      display: block;
+      height: 10px;
+      border-radius: 6px;
+      margin: 6px 0;
+      background: linear-gradient(90deg, rgba(255,215,64,0.95), rgba(255,149,0,0.95));
+      box-shadow: 0 6px 18px rgba(255,145,0,0.12), inset 0 0 0 2px rgba(255,255,255,0.06);
+      transition: opacity 180ms ease, transform 160ms cubic-bezier(.2,.9,.3,1);
+      transform: translateY(-2px);
+      opacity: 0.98;
+      pointer-events: none;
+    }
+
+    /* Slightly emphasize the surrounding card to make insertion clear */
+    .library-card.insert-before, .library-card.insert-after { box-shadow: 0 10px 28px rgba(0,0,0,0.28); transform: translateY(-3px); }
+    .shelf-insert-bar {
+      display: block;
+      height: 8px;
+      border-radius: 6px;
+      margin: 6px 0;
+      background: linear-gradient(90deg, rgba(96,165,250,0.95), rgba(59,130,246,0.95));
+      box-shadow: 0 6px 14px rgba(59,130,246,0.12), inset 0 0 0 2px rgba(255,255,255,0.03);
+      transition: opacity 140ms ease, transform 120ms cubic-bezier(.2,.9,.3,1);
+      transform: translateY(-2px);
+      opacity: 0.98;
+      pointer-events: none;
+    }
 
     /* scrollbars for shelf drops */
     .shelf-drop::-webkit-scrollbar { height: 10px; }
@@ -805,6 +877,7 @@
       }
     }
 
+
     /* Mobile optimizations */
     @media(max-width:720px){
       
@@ -962,15 +1035,16 @@
           <p>Kitap Takip Sistemi</p>
         </div>
         <div class="search-wrapper">
-          <div class="search-bar">
-            <input type="search" placeholder="Kitap, yazar ara..." id="search-input" />
-            <button class="btn btn-secondary btn-icon" id="local-search-btn" title="Kitaplığımda Ara">
-              <i class="fas fa-filter"></i>
-            </button>
-            <button class="btn btn-primary btn-icon" id="search-btn" title="Google Books'ta Ara">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
+          <div class="search-bar" style="display:flex;align-items:center;gap:8px;">
+              <input type="search" placeholder="Kitap, yazar ara..." id="search-input" style="flex:1" />
+              <button class="btn btn-secondary btn-icon" id="local-search-btn" title="Kitaplığımda Ara">
+                <i class="fas fa-filter"></i>
+              </button>
+              <button class="btn btn-primary btn-icon" id="search-btn" title="Ara">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+            <!-- advanced search removed per user request -->
           <div class="search-results" id="search-results"></div>
         </div>
         <div class="header-actions">
@@ -1058,49 +1132,83 @@
   </nav>
 
   <div class="modal" id="add-modal">
-    <div class="modal-content">
+    <div class="modal-content two-pane" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
       <div class="modal-header modal-important">
-        <span>Kitap Ekle / Düzenle</span>
-        <button class="modal-close" id="modal-close">&times;</button>
+        <span id="add-modal-title">Kitap Ekle / Düzenle</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-secondary" id="modal-open-search" title="Sağdan arama aç">Ara</button>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
       </div>
-      <form class="form-grid" id="book-form">
-        <!-- Important fields shown first -->
-        <div class="form-group full"><label>Kitap Adı *</label><input id="f-title" type="text" required /></div>
-        <div class="form-group"><label>Yazar</label><input id="f-author" type="text" /></div>
-        <div class="form-group"><label>Toplam Sayfa</label><input id="f-totalPages" type="number" /></div>
-        <div class="form-group"><label>Okunan Sayfa</label><input id="f-pagesRead" type="number" /></div>
-        <div class="form-group"><label>Yayın Tarihi</label><input id="f-publishedDate" type="date" /></div>
-        <div class="form-group full"><label>Kapak Resmi URL</label><input id="f-cover" type="url" /></div>
 
-        <!-- Accordion for extra / optional fields marked with <> style toggle -->
-        <div class="form-group full accordion">
-          <button type="button" class="acc-toggle"><span class="chev">&lt;&gt;</span> Diğer Bilgiler</button>
-          <div class="acc-content" id="extra-fields">
-            <div class="form-group"><label>Yayınevi</label><input id="f-publisher" type="text" /></div>
-            <div class="form-group"><label>Rafa Eklenme Tarihi</label><input id="f-addDate" type="date" /></div>
-            <div class="form-group"><label>Bitirme Tarihi</label><input id="f-finishDate" type="date" /></div>
-            <div class="form-group" style="display:flex;flex-direction:column;gap:6px"><label>Oda</label>
-              <div style="display:flex;gap:8px;align-items:center">
-                <input id="f-room" list="rooms-list" type="text" style="flex:1;" />
-                <button type="button" id="add-room-btn" class="btn btn-primary">Oda Ekle</button>
+      <div style="display:flex;flex-direction:column;gap:8px;padding: 20px;height: 100%;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;height: 100%;">
+          <div class="left-pane" style="flex:1;min-width:320px;">
+            <form class="form-grid" id="book-form">
+              <!-- Important fields shown first -->
+              <div class="form-group full"><label>Kitap Adı *</label><input id="f-title" type="text" required autocomplete="off" /></div>
+              <div class="form-group"><label>Yazar</label><input id="f-author" type="text" autocomplete="off" /></div>
+              <div class="form-group"><label>Toplam Sayfa</label><input id="f-totalPages" type="number" /></div>
+              <div class="form-group"><label>Okunan Sayfa</label><input id="f-pagesRead" type="number" /></div>
+              <div class="form-group"><label>Yayın Tarihi</label><input id="f-publishedDate" type="date" /></div>
+              <div class="form-group full"><label>Kapak Resmi URL</label><input id="f-cover" type="url" /></div>
+
+              <!-- Accordion for extra / optional fields marked with <> style toggle -->
+              <div class="form-group full accordion">
+                <button type="button" class="acc-toggle"><span class="chev">&lt;&gt;</span> Diğer Bilgiler</button>
+                <div class="acc-content" id="extra-fields">
+                  <div class="form-group"><label>Yayınevi</label><input id="f-publisher" type="text" /></div>
+                  <div class="form-group"><label>Rafa Eklenme Tarihi</label><input id="f-addDate" type="date" /></div>
+                  <div class="form-group"><label>Bitirme Tarihi</label><input id="f-finishDate" type="date" /></div>
+                  <div class="form-group" style="display:flex;flex-direction:column;gap:6px"><label>Oda</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input id="f-room" list="rooms-list" type="text" style="flex:1;" />
+                      <button type="button" id="add-room-btn" class="btn btn-primary">Oda Ekle</button>
+                    </div>
+                    <datalist id="rooms-list"></datalist>
+                  </div>
+                  <div class="form-group"><label>Kitaplık</label><input id="f-bookshelf" type="text" list="bookshelf-list" /></div>
+                  <datalist id="bookshelf-list"></datalist>
+                  <div class="form-group"><label>Raf</label><input id="f-shelf" type="text" list="shelf-list" /></div>
+                  <datalist id="shelf-list"></datalist>
+                  <div class="form-group full"><label>Not</label><textarea id="f-note"></textarea></div>
+                </div>
               </div>
-              <datalist id="rooms-list"></datalist>
-            </div>
-            <div class="form-group"><label>Kitaplık</label><input id="f-bookshelf" type="text" list="bookshelf-list" /></div>
-            <datalist id="bookshelf-list"></datalist>
-            <div class="form-group"><label>Raf</label><input id="f-shelf" type="text" list="shelf-list" /></div>
-            <datalist id="shelf-list"></datalist>
-            <div class="form-group full"><label>Not</label><textarea id="f-note"></textarea></div>
-          </div>
-        </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" id="cancel-btn">İptal</button>
-          <button type="submit" class="btn btn-primary">Kaydet</button>
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-btn">İptal</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+              </div>
+            </form>
+          </div>
+
+          <aside class="right-pane" id="modal-search-pane" style="display:none;min-width:280px;position:relative;height: 100%;">
+            <div id="modal-search-controls" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+              <input id="modal-search-input" class="form-input" type="search" placeholder="Sağ pane: arama yap veya düzenle" style="flex:1" />
+              <button id="modal-search-btn" class="btn btn-primary">Ara</button>
+            </div>
+              <div id="modal-search-results" style="overflow:auto;border:1px solid var(--border);border-radius:8px;padding:6px;background:var(--card)"></div>
+              <div id="modal-search-webview-wrapper" style="margin-top:8px;display:none;flex-direction:column;gap:8px">
+                
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+                  <div style="font-size:13px;color:var(--text-muted)">Site önizlemesi (küçük pencere)</div>
+                  <div style="display:flex;gap:8px">
+                    <button id="modal-webview-open-new" class="btn btn-secondary">Yeni Sekmede Aç</button>
+                    <button id="modal-webview-hide" class="btn btn-secondary">Kapat</button>
+                  </div>
+                </div>
+                <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card);height: 100%;">
+                  <iframe id="modal-search-webview" src="about:blank" style="width:100%;height:36vh;border:0;display:block"></iframe>
+                </div>
+                <div id="modal-search-webview-note" style="font-size:12px;color:var(--text-muted)">Not: Bazı siteler iframe içinde açılmayabilir; bu durumda "Yeni Sekmede Aç" kullanın.</div>
+              </div>
+          </aside>
         </div>
-      </form>
+      </div>
     </div>
   </div>
+
+  <!-- Settings modal removed per user request -->
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1191,6 +1299,11 @@
     function initApp() {
       const modal = document.getElementById('add-modal');
       const bookForm = document.getElementById('book-form');
+      const modalOpenSearchBtn = document.getElementById('modal-open-search');
+      const modalSearchPane = document.getElementById('modal-search-pane');
+      const modalSearchInput = document.getElementById('modal-search-input');
+      const modalSearchBtn = document.getElementById('modal-search-btn');
+      const modalSearchResults = document.getElementById('modal-search-results');
       const skeletonOverlay = document.getElementById('skeleton-overlay');
       const booksList = document.getElementById('books-list');
       const addBtn = document.getElementById('add-btn');
@@ -1237,13 +1350,228 @@
         } catch (err) { console.error('Oda ekleme hatası', err); alert('Oda eklenemedi'); }
       });
 
+      // Do NOT close modal when clicking backdrop; require explicit cancel/close
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
+          // ignore backdrop clicks to prevent accidental closure; user must press İptal or ×
+          e.stopPropagation();
+          return;
+        }
+      });
+
+      // Modal helpers: open with optional search pane and prefill
+      function openAddModal(prefillTitle = '', openSearch = false) {
+        try {
+          // reset and prefill
+          bookForm.reset();
+          editingKey = null;
+          if (prefillTitle) {
+            const t = document.getElementById('f-title'); if (t) t.value = prefillTitle;
+            // also prefill modal search input so user can quickly use it
+            if (modalSearchInput) modalSearchInput.value = prefillTitle;
+          }
+          // Lock background scrolling and interactions and mark modal-open
+          try { document.body.style.overflow = 'hidden'; document.body.classList.add('modal-open'); } catch(_) {}
+          modal.classList.add('active');
+          // open right pane optionally
+          if (openSearch && modalSearchPane) {
+            modalSearchPane.style.display = 'block';
+            // perform search immediately with the prefilled query
+            setTimeout(() => {
+              try { if (modalSearchInput && modalSearchInput.value.trim()) modalSearchBtn && modalSearchBtn.click(); } catch(e){}
+            }, 80);
+          }
+        } catch (e) { console.error('openAddModal', e); }
+      }
+
+      function closeAddModal() {
+        try {
+          // Restore background scrolling and hide modal
+          try { document.body.style.overflow = ''; document.body.classList.remove('modal-open'); } catch(_) {}
           modal.classList.remove('active');
           bookForm.reset();
           editingKey = null;
-        }
+          if (modalSearchPane) modalSearchPane.style.display = 'none';
+          if (modalSearchResults) modalSearchResults.innerHTML = '';
+          // cleanup iframe
+          const web = document.getElementById('modal-search-webview');
+          if (web) { web.src = 'about:blank'; document.getElementById('modal-search-webview-wrapper').style.display = 'none'; }
+        } catch (e) { console.error('closeAddModal', e); }
+      }
+
+      // Detect iframe blocking (X-Frame-Options / CSP) and show friendly fallback UI
+      function detectIframeBlocking(iframeEl, url, wrapperEl) {
+        try {
+          if (!iframeEl || !wrapperEl) return;
+
+          // clear previous handlers
+          try { iframeEl.onload = null; iframeEl.onerror = null; } catch (e) {}
+
+
+          // small timeout heuristic: if onload doesn't allow access or errors, treat as blocked
+          let done = false;
+
+          // onload attempt: some pages still fire onload but block framing — check access there too
+          iframeEl.onload = () => {
+            if (done) return;
+            try {
+              const doc = iframeEl.contentDocument || (iframeEl.contentWindow && iframeEl.contentWindow.document);
+              if (doc && doc.location && !doc.location.href.startsWith('about:blank')) {
+                // accessible — clear any status
+                status.style.display = 'none';
+                done = true;
+                clearTimeout(timeout);
+                return;
+              }
+            } catch (err) {
+              done = true; clearTimeout(timeout); showBlocked('Hedef site gömülmeyi engelledi.');
+            }
+          };
+
+          iframeEl.onerror = () => { if (!done) { done = true; clearTimeout(timeout); showBlocked('Iframe yükleme hatası.'); } };
+        } catch (e) { console.error('detectIframeBlocking', e); }
+      }
+
+      // Modal search pane wiring
+      if (modalOpenSearchBtn) modalOpenSearchBtn.addEventListener('click', () => {
+        try {
+          if (!modalSearchPane) return;
+          modalSearchPane.style.display = modalSearchPane.style.display === 'block' ? 'none' : 'block';
+          if (modalSearchPane.style.display === 'block') modalSearchInput && modalSearchInput.focus();
+        } catch (e) { console.error(e); }
       });
+
+      if (modalSearchBtn) modalSearchBtn.addEventListener('click', async () => {
+        try {
+          const q = modalSearchInput && modalSearchInput.value ? modalSearchInput.value.trim() : '';
+          if (!q) return alert('Arama terimi girin');
+          modalSearchResults.innerHTML = '<div style="padding:12px;text-align:center" class="loading"><i class="fas fa-spinner spinner"></i> Aranıyor...</div>';
+          // Build useful external search links pointing to Turkish book sellers
+          // (we avoid generic Google searches and prefer local sellers' search pages)
+          const links = [];
+          const stores = [
+
+
+
+
+
+
+
+            // KİTAPÇILARIN SİTESİ
+            { label: 'Idefix', url: `https://www.idefix.com/arama?q=${encodeURIComponent(q)}` },
+            { label: 'Kitapyurdu', url: `https://www.kitapyurdu.com/index.php?route=product/search&filter_name=${encodeURIComponent(q)}` },
+            { label: 'D&R', url: `https://www.dr.com.tr/search/?q=${encodeURIComponent(q)}` },
+            { label: 'Babil', url: `https://www.babil.com/ara/?q=${encodeURIComponent(q)}` },
+            { label: 'NadirKitap', url: `https://www.nadirkitap.com/arama?search_text=${encodeURIComponent(q)}` },
+            { label: 'Hepsiburada', url: `https://www.hepsiburada.com/ara?q=${encodeURIComponent(q)}` },
+            { label: 'Amazon TR', url: `https://www.amazon.com.tr/s?k=${encodeURIComponent(q)}` }
+            // KİTAPÇILARIN SİTESİ
+
+
+
+
+
+
+
+          ];
+          stores.forEach(s => links.push(s));
+
+          modalSearchResults.innerHTML = '';
+          // render as list of links with 'Aç' button that loads into iframe
+          links.forEach(l => {
+            const item = document.createElement('div'); item.className = 'search-result-item';
+            item.style.display = 'flex'; item.style.justifyContent = 'space-between'; item.style.alignItems = 'center';
+            item.style.gap = '8px';
+            item.innerHTML = `
+              <div style="flex:1">
+                <div style="font-weight:600">${l.label}</div>
+                <div style="font-size:12px;color:var(--text-muted);">${l.url}</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary open-in-pane">Önizle</button>
+                <button class="btn btn-primary open-new">Yeni Sekmede Aç</button>
+              </div>
+            `;
+            const openInPane = item.querySelector('.open-in-pane');
+            const openNew = item.querySelector('.open-new');
+            openInPane.addEventListener('click', () => {
+              try {
+                const wrapper = document.getElementById('modal-search-webview-wrapper');
+                const iframe = document.getElementById('modal-search-webview');
+                const openNewBtn = document.getElementById('modal-webview-open-new');
+                const hideBtn = document.getElementById('modal-webview-hide');
+                const closePaneBtn = document.getElementById('modal-webview-closepane');
+                const modalPaneEl = document.getElementById('modal-search-pane');
+                const modalContentEl = modal ? modal.querySelector('.modal-content.two-pane') : null;
+                if (wrapper && iframe && modalPaneEl) {
+                  // on small screens we want the preview to cover the entire modal (mobile preview)
+                  if (window.innerWidth <= 880 && modalContentEl) {
+                    modalContentEl.classList.add('mobile-preview-active');
+                  } else {
+                    // desktop: expand only the right pane
+                    modalPaneEl.classList.add('preview-active');
+                  }
+                  iframe.src = l.url;
+                  wrapper.style.display = 'flex';
+                  // detect blocking and show fallback if blocked
+                  try { detectIframeBlocking(iframe, l.url, wrapper); } catch (e) { console.warn('detect call failed', e); }
+                  // wire open-new
+                  if (openNewBtn) {
+                    openNewBtn.onclick = () => window.open(l.url, '_blank');
+                  }
+                  // hideBtn should also exit preview mode
+                  if (hideBtn) hideBtn.onclick = () => { if (modalContentEl) modalContentEl.classList.remove('mobile-preview-active'); modalPaneEl.classList.remove('preview-active'); wrapper.style.display = 'none'; iframe.src = 'about:blank'; };
+                  // close pane button (top-right of pane) hides the preview and returns to search UI
+                  if (closePaneBtn) closePaneBtn.onclick = () => { if (modalContentEl) modalContentEl.classList.remove('mobile-preview-active'); modalPaneEl.classList.remove('preview-active'); wrapper.style.display = 'none'; iframe.src = 'about:blank'; if (modalSearchInput) modalSearchInput.focus(); };
+                }
+              } catch (e) { console.error('openInPane', e); }
+            });
+            openNew.addEventListener('click', () => window.open(l.url, '_blank'));
+            modalSearchResults.appendChild(item);
+          });
+
+          // also offer quick provider-API based suggestions below (doğrudan metadata)
+          const providerHeader = document.createElement('div'); providerHeader.style.marginTop = '8px'; providerHeader.style.fontSize = '13px'; providerHeader.style.fontWeight = '600'; providerHeader.textContent = 'API Önerileri (doğrudan metadata)';
+          modalSearchResults.appendChild(providerHeader);
+          // try OpenLibrary and Gutendex adapters for structured metadata suggestions
+          try {
+            const ol = typeof searchOpenLibrary === 'function' ? await searchOpenLibrary(q) : [];
+            const gu = typeof searchGutendex === 'function' ? await searchGutendex(q) : [];
+            const combined = (Array.isArray(ol) ? ol : []).concat(Array.isArray(gu) ? gu : []);
+            if (combined && combined.length) {
+              combined.slice(0,6).forEach(it => {
+                const title = it.title || it.name || '';
+                const authors = (it.author_name && Array.isArray(it.author_name)) ? it.author_name.join(', ') : (it.authors && Array.isArray(it.authors) ? (it.authors.map(a => a.name || a).join(', ')) : '');
+                const cover = (it.cover_i) ? `https://covers.openlibrary.org/b/id/${it.cover_i}-M.jpg` : (it.cover || it.image || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23ccc%22 width=%2240%22 height=%2260%22/%3E%3C/svg%3E');
+                const el = document.createElement('div'); el.className = 'search-result-item';
+                el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.gap = '8px';
+                el.innerHTML = `
+                  <img src="${cover}" style="width:40px;height:60px;object-fit:cover;border-radius:4px;margin-right:8px" />
+                  <div style="flex:1">
+                    <div style="font-weight:600">${title}</div>
+                    <div style="font-size:12px;color:var(--text-muted)">${authors}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <button class="btn btn-primary copy-to-form-small">Kopyala</button>
+                    <button class="btn btn-success copy-close-small">Kopyala ve Kapat</button>
+                  </div>
+                `;
+                const copyBtn = el.querySelector('.copy-to-form-small');
+                const copyClose = el.querySelector('.copy-close-small');
+                copyBtn.onclick = () => {
+                  const setIf = (id, val) => { const e = document.getElementById(id); if (e) e.value = val || ''; };
+                  setIf('f-title', title || ''); setIf('f-author', authors || ''); setIf('f-cover', cover || '');
+                };
+                copyClose.onclick = () => { copyBtn.onclick(); closeAddModal(); };
+                modalSearchResults.appendChild(el);
+              });
+            }
+          } catch (err) { console.warn('provider quick meta failed', err); }
+        } catch (err) { console.error('modal search', err); modalSearchResults.innerHTML = '<div style="padding:12px;color:var(--danger)">Arama sırasında hata</div>'; }
+      });
+
+      if (modalSearchInput) modalSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); modalSearchBtn && modalSearchBtn.click(); } });
+
 
       viewToggle.addEventListener('click', () => {
         compactView = !compactView;
@@ -1357,33 +1685,300 @@
         }
       });
 
-      searchBtn.addEventListener('click', () => searchGoogleBooks(searchInput.value));
-      localSearchBtn.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        if (!query) return alert('Arama terimi girin');
-        const results = searchLocalBooks(query);
-        if (results.length === 0) {
-          const searchResults = document.getElementById('search-results');
-          searchResults.innerHTML = `
-            <div style="padding:20px;text-align:center;color:var(--text-muted);">
-              Kitaplığınızda kitap bulunamadı
-              <div style="margin-top:12px"><button id="create-local" class="btn btn-success">Yeni Kitap Oluştur</button></div>
+      // New unified search handler (quick + advanced)
+      // advanced search UI removed; using quick search only
+      const providerSelect = null;
+      const includeLocalChk = null;
+
+      // Wire search buttons
+      if (localSearchBtn) {
+        localSearchBtn.addEventListener('click', () => {
+          const query = searchInput.value.trim();
+          if (!query) return alert('Arama terimi girin');
+          const results = searchLocalBooks(query);
+          if (results && results.length) displayLocalResults(results);
+          else {
+            const sr = document.getElementById('search-results');
+            const q = (searchInput && searchInput.value) ? searchInput.value.trim() : '';
+            sr.innerHTML = `
+              <div style="padding:18px;text-align:center;color:var(--text-muted);">
+                Kitaplığınızda kitap bulunamadı
+                <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
+                  <div style="color:var(--text-muted);font-weight:600">Aradağın kitap yok mu? O zaman kendin hızlı ekle!</div>
+                  <button id="quick-add-from-local" class="btn btn-success">Kitap Ekle</button>
+                </div>
+              </div>
+            `;
+            sr.classList.add('show');
+            const quickLocal = document.getElementById('quick-add-from-local');
+            if (quickLocal) quickLocal.addEventListener('click', () => { openAddModal(q || '', true); sr.classList.remove('show'); });
+          }
+        });
+      }
+
+      if (searchBtn) {
+        searchBtn.addEventListener('click', async () => {
+          const q = (searchInput && searchInput.value) ? searchInput.value.trim() : '';
+          const opts = { q, provider: 'all', includeLocal: false, limit: 20 };
+          const res = await performAdvancedSearch(opts);
+          displaySearchResultsUnified(res);
+        });
+      }
+
+      // Enter key triggers search
+      if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { if (searchBtn) searchBtn.click(); } });
+
+      // advanced search button removed
+
+      async function displaySearchResultsUnified(results) {
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = '';
+        // Render results (if any)
+        if (!results || results.length === 0) {
+          searchResults.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);">Sonuç bulunamadı</div>`;
+        } else {
+          results.slice(0, 20).forEach(book => {
+            const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23ccc%22 width=%2240%22 height=%2260%22/%3E%3C/svg%3E';
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+            div.innerHTML = `
+              <img src="${book.cover || placeholder}" alt="cover" onerror="this.src='${placeholder}'" />
+              <div class="search-result-info">
+                <div class="search-result-title">${book.title || 'Bilinmiyor'}</div>
+                <div class="search-result-meta">${(book.authors || book.author || ['Yazar Bilinmiyor']).join ? (book.authors || book.author || ['Yazar Bilinmiyor']).join(', ') : (book.authors || book.author || 'Yazar Bilinmiyor')}</div>
+                <div class="search-result-meta">${book.publisher || ''} ${book.publishedDate || ''}</div>
+              </div>
+            `;
+            div.addEventListener('click', () => {
+              const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+              setIf('f-title', book.title || '');
+              setIf('f-author', (book.authors || book.author || []).join ? (book.authors || book.author || []).join(', ') : (book.authors || book.author || ''));
+              setIf('f-publisher', book.publisher || '');
+              setIf('f-publishedDate', book.publishedDate || '');
+              setIf('f-totalPages', book.pageCount || '');
+              setIf('f-cover', book.cover || '');
+
+              searchResults.classList.remove('show');
+              document.getElementById('search-input').value = '';
+              document.getElementById('add-modal').classList.add('active');
+            });
+            searchResults.appendChild(div);
+          });
+        }
+
+        // Always show quick-add footer at bottom of results
+        try {
+          const existingFoot = document.getElementById('search-results-footer');
+          if (existingFoot) existingFoot.remove();
+          const q = (document.getElementById('search-input') && document.getElementById('search-input').value) ? document.getElementById('search-input').value.trim() : '';
+          const foot = document.createElement('div');
+          foot.id = 'search-results-footer';
+          foot.style.padding = '14px';
+          foot.style.textAlign = 'center';
+          foot.style.color = 'var(--text-muted)';
+          foot.innerHTML = `
+            <div style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
+              <div style="font-weight:600">Aradağın kitap yok mu? O zaman kendin hızlı ekle!</div>
+              <button id="quick-add-from-search" class="btn btn-success">Kitap Ekle</button>
             </div>
           `;
-          searchResults.classList.add('show');
-          const createLocal = document.getElementById('create-local');
-          if (createLocal) createLocal.addEventListener('click', () => { 
-            document.getElementById('f-title').value = query || '';
-            modal.classList.add('active'); 
-            searchResults.classList.remove('show'); 
+          searchResults.appendChild(foot);
+          const quick = document.getElementById('quick-add-from-search');
+          if (quick) quick.addEventListener('click', () => { openAddModal(q || '', true); searchResults.classList.remove('show'); });
+        } catch (e) { /* ignore footer errors */ }
+        results.slice(0, 20).forEach(book => {
+          const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2260%22%3E%3Crect fill=%22%23ccc%22 width=%2240%22 height=%2260%22/%3E%3C/svg%3E';
+          const div = document.createElement('div');
+          div.className = 'search-result-item';
+          div.innerHTML = `
+            <img src="${book.cover || placeholder}" alt="cover" onerror="this.src='${placeholder}'" />
+            <div class="search-result-info">
+              <div class="search-result-title">${book.title || 'Bilinmiyor'}</div>
+              <div class="search-result-meta">${(book.authors || book.author || ['Yazar Bilinmiyor']).join ? (book.authors || book.author || ['Yazar Bilinmiyor']).join(', ') : (book.authors || book.author || 'Yazar Bilinmiyor')}</div>
+              <div class="search-result-meta">${book.publisher || ''} ${book.publishedDate || ''}</div>
+            </div>
+          `;
+          div.addEventListener('click', () => {
+            const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setIf('f-title', book.title || '');
+            setIf('f-author', (book.authors || book.author || []).join ? (book.authors || book.author || []).join(', ') : (book.authors || book.author || ''));
+            setIf('f-publisher', book.publisher || '');
+            setIf('f-publishedDate', book.publishedDate || '');
+            setIf('f-totalPages', book.pageCount || '');
+            setIf('f-cover', book.cover || '');
+
+            searchResults.classList.remove('show');
+            document.getElementById('search-input').value = '';
+            document.getElementById('add-modal').classList.add('active');
           });
-          return;
+          searchResults.appendChild(div);
+        });
+        searchResults.classList.add('show');
+      }
+
+      // perform a query across the selected providers
+      async function performAdvancedSearch(opts) {
+        const results = [];
+        const provider = opts && opts.provider ? opts.provider : 'all';
+        const providers = (provider === 'all') ? ['google', 'openlibrary', 'gutendex', 'loc'] : [provider];
+        const promises = providers.map(p => {
+          if (p === 'google') return (typeof searchGoogleBooksProvider === 'function' ? searchGoogleBooksProvider(opts) : Promise.resolve([]));
+          if (p === 'openlibrary') return (typeof searchOpenLibrary === 'function' ? searchOpenLibrary(opts) : Promise.resolve([]));
+          if (p === 'gutendex') return (typeof searchGutendex === 'function' ? searchGutendex(opts) : Promise.resolve([]));
+          if (p === 'loc') return (typeof searchLibraryOfCongress === 'function' ? searchLibraryOfCongress(opts) : Promise.resolve([]));
+          // milli provider removed
+          return Promise.resolve([]);
+        });
+        const settled = await Promise.allSettled(promises);
+        settled.forEach(s => { if (s.status === 'fulfilled' && Array.isArray(s.value)) results.push(...s.value); });
+
+        // include local matches if requested
+        if (opts && opts.includeLocal) {
+          try { const local = searchLocalBooks(opts.q || opts.title || ''); results.push(...local.map(r => ({ title: r.title, authors: [r.author], publisher: r.publisher, cover: r.cover, source: 'local', key: r.key }))); } catch (e) {}
         }
-        displayLocalResults(results);
-      });
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') searchGoogleBooks(searchInput.value);
-      });
+
+        // dedupe by title + first author
+        const seen = new Map();
+        const merged = [];
+        results.forEach(r => {
+          const t = (r.title || '').toString().toLowerCase().trim();
+          const a = Array.isArray(r.authors) ? (r.authors[0] || '') : (Array.isArray(r.author) ? (r.author[0]||'') : (r.author || ''));
+          const key = (t + '|' + (a || '')).replace(/\s+/g, ' ');
+          if (!seen.has(key)) { seen.set(key, true); merged.push(r); }
+        });
+        return merged;
+      }
+
+      // OpenLibrary provider
+      async function searchOpenLibrary(query) {
+        const opts = { limit: 10 };
+        if (!query) return [];
+        if (typeof query === 'string') opts.q = query.trim();
+        else Object.assign(opts, query);
+
+        try {
+          const params = new URLSearchParams();
+          if (opts.title) params.append('title', opts.title);
+          if (opts.author) params.append('author', opts.author);
+          if (opts.publisher) params.append('publisher', opts.publisher);
+          if (opts.q) params.append('q', opts.q);
+          params.append('limit', String(opts.limit || 10));
+          const res = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+          const data = await res.json();
+          if (!data.docs || !Array.isArray(data.docs)) return [];
+          return data.docs.map(d => ({
+            title: d.title || '',
+            authors: d.author_name || [],
+            publisher: (d.publisher && d.publisher[0]) || '',
+            publishedDate: d.first_publish_year || '',
+            pageCount: d.number_of_pages_median || '',
+            cover: d.cover_i ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg` : '',
+            source: 'openlibrary',
+            raw: d
+          }));
+        } catch (e) {
+          console.error('searchOpenLibrary', e);
+          return [];
+        }
+      }
+
+      // Google Books provider (returns normalized array for merging)
+      async function searchGoogleBooksProvider(query) {
+        const opts = { limit: 10 };
+        if (!query) return [];
+        if (typeof query === 'string') opts.q = query.trim();
+        else Object.assign(opts, query);
+
+        try {
+          const parts = [];
+          if (opts.title) parts.push('intitle:' + opts.title);
+          if (opts.author) parts.push('inauthor:' + opts.author);
+          if (opts.publisher) parts.push('inpublisher:' + opts.publisher);
+          if (opts.q) parts.push(opts.q);
+          const q = parts.join(' ') || '';
+          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=${opts.limit || 10}`);
+          const data = await response.json();
+          if (!data.items || !Array.isArray(data.items)) return [];
+          return data.items.map(item => {
+            const info = item.volumeInfo || {};
+            return {
+              title: info.title || '',
+              authors: info.authors || [],
+              publisher: info.publisher || '',
+              publishedDate: info.publishedDate || '',
+              pageCount: info.pageCount || '',
+              cover: info.imageLinks?.thumbnail || '',
+              source: 'google',
+              raw: item
+            };
+          });
+        } catch (err) {
+          console.error('searchGoogleBooksProvider', err);
+          return [];
+        }
+      }
+
+      // Gutendex (Project Gutenberg) provider
+      async function searchGutendex(query) {
+        const opts = { limit: 10 };
+        if (!query) return [];
+        if (typeof query === 'string') opts.q = query.trim();
+        else Object.assign(opts, query);
+        try {
+          const q = opts.q || opts.title || '';
+          const url = `https://gutendex.com/books?search=${encodeURIComponent(q)}&page=1`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!data.results || !Array.isArray(data.results)) return [];
+          return data.results.slice(0, opts.limit || 10).map(b => ({
+            title: b.title || '',
+            authors: (b.authors || []).map(a => a.name).filter(Boolean),
+            publisher: '',
+            publishedDate: b.created || '',
+            pageCount: b.pagination || '',
+            cover: (b.formats && (b.formats['image/jpeg'] || b.formats['image/png'])) || '',
+            source: 'gutendex',
+            raw: b
+          }));
+        } catch (e) {
+          console.error('searchGutendex', e);
+          return [];
+        }
+      }
+
+      // Library of Congress provider
+      async function searchLibraryOfCongress(query) {
+        const opts = { limit: 10 };
+        if (!query) return [];
+        if (typeof query === 'string') opts.q = query.trim();
+        else Object.assign(opts, query);
+        try {
+          const q = opts.q || opts.title || '';
+          const params = new URLSearchParams();
+          if (q) params.append('q', q);
+          params.append('fo', 'json');
+          params.append('at', 'results');
+          const url = `https://www.loc.gov/books/?${params.toString()}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!data.results || !Array.isArray(data.results)) return [];
+          return data.results.slice(0, opts.limit || 10).map(r => ({
+            title: r.title || '',
+            authors: r.creator ? (Array.isArray(r.creator) ? r.creator : [r.creator]) : [],
+            publisher: r.publisher || '',
+            publishedDate: r.date || '',
+            pageCount: '',
+            cover: r.image_url || '',
+            source: 'loc',
+            raw: r
+          }));
+        } catch (e) {
+          console.error('searchLibraryOfCongress', e);
+          return [];
+        }
+      }
+
+      // Milli Kütüphane adapter removed per user request
 
       // Arama sonuçları dışına tıklandığında kapat
       document.addEventListener('click', (e) => {
@@ -1396,10 +1991,13 @@
 
       // Modal open/close wiring
       const fabBtn = document.getElementById('fab-btn');
-      if (addBtn) addBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.add('active'); editingKey = null; });
+      if (addBtn) addBtn.addEventListener('click', () => { openAddModal('', false); });
       if (fabBtn) fabBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.add('active'); editingKey = null; });
-      if (cancelBtn) cancelBtn.addEventListener('click', () => { document.getElementById('add-modal').classList.remove('active'); document.getElementById('book-form').reset(); editingKey = null; });
-      if (modalClose) modalClose.addEventListener('click', () => { document.getElementById('add-modal').classList.remove('active'); document.getElementById('book-form').reset(); editingKey = null; });
+      if (cancelBtn) cancelBtn.addEventListener('click', () => { closeAddModal(); });
+      if (modalClose) modalClose.addEventListener('click', () => { closeAddModal(); });
+
+      // Settings removed (Milli Kütüphane feature disabled)
+
 
       // Mobile bottom nav handlers
       const navHome = document.getElementById('navHome');
@@ -1419,7 +2017,7 @@
       });
 
       if(navAdd) navAdd.addEventListener('click', () => {
-        modal.classList.add('active');
+        openAddModal('', false);
       });
 
       if(navView) navView.addEventListener('click', () => {
@@ -1954,6 +2552,8 @@
         // store state globally so move/up handlers can access
         window.__ptrShelfDrag = { libId, shelfId, shelfEl, shelvesList, pointerId: ev.pointerId, ghost: null, candidate: null };
 
+        try { createSrcPlaceholder(shelfEl); } catch (e) {}
+
         // create a ghost element that follows the pointer
         const ghost = shelfEl.cloneNode(true);
         ghost.style.position = 'fixed';
@@ -1990,16 +2590,36 @@
           ghost.style.left = (ev.clientX + 8) + 'px';
           ghost.style.top = (ev.clientY + 8) + 'px';
         }
-        const children = Array.from((st.shelvesList || document).querySelectorAll('.shelf-card'));
+        const container = (st.shelvesList || document);
+        const children = Array.from(container.querySelectorAll('.shelf-card'));
         let candidate = null;
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
           const r = child.getBoundingClientRect();
           if (ev.clientY < r.top + r.height / 2) { candidate = child; break; }
         }
+
+        // clear legacy classes
         children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
-        if (candidate) { candidate.classList.add('insert-before'); st.candidate = { before: candidate }; }
-        else { if (children.length) children[children.length - 1].classList.add('insert-after'); st.candidate = { before: null }; }
+        // remove previous placeholder if present
+        try { if (st.__shelfInsertPlaceholder && st.__shelfInsertPlaceholder.parentElement) st.__shelfInsertPlaceholder.parentElement.removeChild(st.__shelfInsertPlaceholder); } catch (e) {}
+
+        const placeholder = document.createElement('div');
+        placeholder.className = 'shelf-insert-bar';
+        placeholder.dataset.for = st.shelfId || '';
+
+        if (candidate) {
+          candidate.parentElement.insertBefore(placeholder, candidate);
+          candidate.classList.add('insert-before');
+          st.candidate = { before: candidate };
+        } else {
+          if (children.length) children[children.length - 1].parentElement.insertBefore(placeholder, children[children.length - 1].nextSibling);
+          else container.appendChild(placeholder);
+          if (children.length) children[children.length - 1].classList.add('insert-after');
+          st.candidate = { before: null };
+        }
+
+        st.__shelfInsertPlaceholder = placeholder;
         // throttled pointer move log
         throttledLog('pointermove-shelf', ['[pointermove][shelf]', { libId: st.libId, shelfId: st.shelfId, x: ev.clientX, y: ev.clientY }], 160);
       } catch (err) { /* ignore move errors */ }
@@ -2051,7 +2671,133 @@
         try { if (st.shelfEl && st.pointerId) st.shelfEl.releasePointerCapture && st.shelfEl.releasePointerCapture(st.pointerId); } catch (e) {}
         // clear visual hints
         try { const children = Array.from((st.shelvesList || document).querySelectorAll('.shelf-card')); children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); } catch (e) {}
+        try { if (st.__shelfInsertPlaceholder && st.__shelfInsertPlaceholder.parentElement) st.__shelfInsertPlaceholder.parentElement.removeChild(st.__shelfInsertPlaceholder); } catch (e) {}
         window.__ptrShelfDrag = null;
+        window.__currentDrag = null;
+        endDrag();
+      } catch (err) { /* ignore cleanup errors */ }
+    }
+
+    // Pointer-based fallback for library reordering (similar to shelf fallback)
+    function beginLibPointerDrag(ev, libId, libEl, containerEl) {
+      try { ev.preventDefault(); } catch (e) {}
+      try {
+        startDrag();
+        window.__currentDrag = { type: 'lib', id: libId };
+        window.__ptrLibDrag = { libId, libEl, containerEl, pointerId: ev.pointerId, ghost: null, candidate: null };
+        try { if (st.shelfEl) removeSrcPlaceholder(st.shelfEl); } catch (e) {}
+        try { if (st.__shelfInsertPlaceholder && st.__shelfInsertPlaceholder.parentElement) st.__shelfInsertPlaceholder.parentElement.removeChild(st.__shelfInsertPlaceholder); } catch (e) {}
+        try { createSrcPlaceholder(libEl); } catch (e) {}
+
+        const ghost = libEl.cloneNode(true);
+        ghost.style.position = 'fixed';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.opacity = '0.95';
+        ghost.style.zIndex = 9999;
+        const rect = libEl.getBoundingClientRect();
+        ghost.style.width = rect.width + 'px';
+        ghost.style.left = (ev.clientX + 8) + 'px';
+        ghost.style.top = (ev.clientY + 8) + 'px';
+        document.body.appendChild(ghost);
+        window.__ptrLibDrag.ghost = ghost;
+
+        try { libEl.setPointerCapture && libEl.setPointerCapture(ev.pointerId); } catch (e) {}
+
+        document.addEventListener('pointermove', moveLibPointerDrag);
+        document.addEventListener('pointerup', endLibPointerDrag);
+        document.addEventListener('pointercancel', cancelLibPointerDrag);
+
+        try { if (containerEl) containerEl.classList.add('compact-while-dragging'); } catch (e) {}
+        console.log('[pointerdown][lib-handle] start', { libId, x: ev.clientX, y: ev.clientY, time: Date.now() });
+      } catch (err) { console.error('beginLibPointerDrag', err); }
+    }
+
+    function moveLibPointerDrag(ev) {
+      try {
+        const st = window.__ptrLibDrag;
+        if (!st || (ev.pointerId && st.pointerId !== ev.pointerId)) return;
+        const ghost = st.ghost; if (ghost) { ghost.style.left = (ev.clientX + 8) + 'px'; ghost.style.top = (ev.clientY + 8) + 'px'; }
+        const container = (st.containerEl || document);
+        const children = Array.from(container.querySelectorAll('.library-card'));
+        let candidate = null;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          const r = child.getBoundingClientRect();
+          if (ev.clientY < r.top + r.height / 2) { candidate = child; break; }
+        }
+
+        // remove any card classes (legacy) and manage a single visible placeholder bar
+        children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); });
+        // remove previous placeholder if present
+        try { if (st.__libInsertPlaceholder && st.__libInsertPlaceholder.parentElement) st.__libInsertPlaceholder.parentElement.removeChild(st.__libInsertPlaceholder); } catch (e) {}
+
+        const placeholder = document.createElement('div');
+        placeholder.className = 'lib-insert-bar';
+        placeholder.dataset.for = st.libId || '';
+
+        if (candidate) {
+          // insert the bar before the candidate card
+          candidate.parentElement.insertBefore(placeholder, candidate);
+          candidate.classList.add('insert-before');
+          st.candidate = { before: candidate };
+        } else {
+          // append at the end (after last child)
+          if (children.length) children[children.length - 1].parentElement.insertBefore(placeholder, children[children.length - 1].nextSibling);
+          else container.appendChild(placeholder);
+          if (children.length) children[children.length - 1].classList.add('insert-after');
+          st.candidate = { before: null };
+        }
+
+        st.__libInsertPlaceholder = placeholder;
+        throttledLog('pointermove-lib', ['[pointermove][lib]', { libId: st.libId, x: ev.clientX, y: ev.clientY }], 160);
+      } catch (err) { /* ignore */ }
+    }
+
+    async function endLibPointerDrag(ev) {
+      try {
+        const st = window.__ptrLibDrag; if (!st) return cleanupLibPointerDrag();
+        const libId = st.libId;
+        const children2 = Array.from((st.containerEl || document).querySelectorAll('.library-card'));
+        let insertIndex = children2.length;
+        if (st.candidate && st.candidate.before) {
+          insertIndex = children2.indexOf(st.candidate.before);
+          if (insertIndex === -1) insertIndex = children2.length;
+        }
+        const prevEl = insertIndex > 0 ? children2[insertIndex - 1] : null;
+        const nextEl = insertIndex < children2.length ? children2[insertIndex] : null;
+        const prevId = prevEl ? prevEl.dataset.lib : null;
+        const nextId = nextEl ? nextEl.dataset.lib : null;
+        const prevOrder = prevId && libraries[prevId] ? Number(libraries[prevId].order) : null;
+        const nextOrder = nextId && libraries[nextId] ? Number(libraries[nextId].order) : null;
+        console.log('[pointerup][libs-list] insertIndex', { insertIndex, prevId, nextId, prevOrder, nextOrder });
+        let newOrder = computeOrderBetween(prevOrder, nextOrder);
+        if (newOrder == null) {
+          console.log('[pointer][libs-list] reindex needed');
+          await reindexLibraries();
+          await loadLibraries();
+          cleanupLibPointerDrag();
+          return;
+        }
+        await db.ref(`users/${currentUser.uid}/libs/${libId}/order`).set(newOrder);
+        console.log('[pointer][libs-list] db.write done', { libId, newOrder });
+        await loadLibraries();
+      } catch (err) { console.error('endLibPointerDrag', err); }
+      cleanupLibPointerDrag();
+    }
+
+    function cancelLibPointerDrag(ev) { try { console.log('[pointercancel][lib]'); } catch (e) {} finally { cleanupLibPointerDrag(); } }
+
+    function cleanupLibPointerDrag() {
+      try {
+        const st = window.__ptrLibDrag; if (!st) return;
+        try { if (st.ghost && st.ghost.parentElement) st.ghost.parentElement.removeChild(st.ghost); } catch (e) {}
+        try { if (st.containerEl) st.containerEl.classList.remove('compact-while-dragging'); } catch (e) {}
+        try { document.removeEventListener('pointermove', moveLibPointerDrag); document.removeEventListener('pointerup', endLibPointerDrag); document.removeEventListener('pointercancel', cancelLibPointerDrag); } catch (e) {}
+        try { if (st.libEl && st.pointerId) st.libEl.releasePointerCapture && st.libEl.releasePointerCapture(st.pointerId); } catch (e) {}
+        try { const children = Array.from((st.containerEl || document).querySelectorAll('.library-card')); children.forEach(c => { c.classList.remove('insert-before'); c.classList.remove('insert-after'); }); } catch (e) {}
+        try { if (st.__libInsertPlaceholder && st.__libInsertPlaceholder.parentElement) st.__libInsertPlaceholder.parentElement.removeChild(st.__libInsertPlaceholder); } catch (e) {}
+        try { if (st.libEl) removeSrcPlaceholder(st.libEl); } catch (e) {}
+        window.__ptrLibDrag = null;
         window.__currentDrag = null;
         endDrag();
       } catch (err) { /* ignore cleanup errors */ }
@@ -2081,7 +2827,6 @@
           else if (id === 'email-login-btn' || txt.toLowerCase().includes('giriş') ) icon = 'fas fa-sign-in-alt';
           else if (id === 'email-signup-btn' || txt.toLowerCase().includes('kayıt') ) icon = 'fas fa-user-plus';
           else if (txt.toLowerCase().includes('iptal') || id === 'cancel-btn' || id === 'chooser-cancel' || id === 'modal-close') icon = 'fas fa-times';
-          else if (txt.toLowerCase().includes('kaydet') || btn.type === 'submit') icon = 'fas fa-save';
           else if (id === 'navHome' || txt.toLowerCase().includes('ana')) icon = 'fas fa-home';
           else if (id === 'navSearch') icon = 'fas fa-search';
           else if (id === 'navAccount' || txt.toLowerCase().includes('hesap') ) icon = 'fas fa-user';
@@ -2123,7 +2868,40 @@
         // by a small amount so the drag has time to initialize.
         el.dataset.__hasPlaceholder = '1';
         try { if (el.dataset.__placeholderTimer) clearTimeout(Number(el.dataset.__placeholderTimer)); } catch (e) {}
-        const t = setTimeout(() => { try { el.style.visibility = 'hidden'; } catch (e) {} }, 60);
+        const t = setTimeout(() => {
+          try {
+            // create a lightweight placeholder that occupies no layout space
+            try { window.__srcReflowMap = window.__srcReflowMap || new Map(); } catch (e) { window.__srcReflowMap = new Map(); }
+            const rect = el.getBoundingClientRect();
+            const placeholder = document.createElement('div');
+            placeholder.className = 'src-reflow-placeholder';
+            // placeholder intentionally takes no space so other items collapse
+            placeholder.style.width = '0px';
+            placeholder.style.height = '0px';
+            placeholder.style.margin = '0';
+            placeholder.style.padding = '0';
+            placeholder.style.display = 'block';
+            placeholder.style.visibility = 'hidden';
+            // insert placeholder where the element was
+            try { if (el.parentElement) el.parentElement.insertBefore(placeholder, el); }
+            catch (e) {}
+
+            // move the original element to body and position it fixed so it's out of flow
+            try {
+              document.body.appendChild(el);
+              el.style.position = 'fixed';
+              el.style.left = rect.left + 'px';
+              el.style.top = rect.top + 'px';
+              el.style.width = rect.width + 'px';
+              el.style.height = rect.height + 'px';
+              el.style.margin = '0';
+              el.style.pointerEvents = 'none';
+              el.style.visibility = 'hidden';
+            } catch (e) {}
+
+            try { window.__srcReflowMap.set(el, { placeholder }); } catch (e) {}
+          } catch (e) { /* ignore */ }
+        }, 60);
         el.dataset.__placeholderTimer = String(t);
       } catch (e) { /* ignore */ }
     }
@@ -2131,11 +2909,35 @@
     function removeSrcPlaceholder(el) {
       try {
         if (!el) return;
-        if (el.dataset) {
-          try { if (el.dataset.__placeholderTimer) { clearTimeout(Number(el.dataset.__placeholderTimer)); delete el.dataset.__placeholderTimer; } } catch (e) {}
-          delete el.dataset.__hasPlaceholder;
-        }
-        el.style.visibility = '';
+        try { if (el.dataset && el.dataset.__placeholderTimer) { clearTimeout(Number(el.dataset.__placeholderTimer)); delete el.dataset.__placeholderTimer; } } catch (e) {}
+        try { delete el.dataset.__hasPlaceholder; } catch (e) {}
+
+        // If we moved the element out of flow, restore it to its placeholder position
+        try {
+          const map = window.__srcReflowMap || new Map();
+          const info = map.get(el);
+          if (info && info.placeholder) {
+            const ph = info.placeholder;
+            try {
+              // restore element back before placeholder
+              ph.parentElement.insertBefore(el, ph);
+            } catch (e) { /* ignore */ }
+            try { ph.parentElement.removeChild(ph); } catch (e) {}
+            try { map.delete(el); } catch (e) {}
+          }
+        } catch (e) { /* ignore */ }
+
+        // clear positioning/styles
+        try {
+          el.style.position = '';
+          el.style.left = '';
+          el.style.top = '';
+          el.style.width = '';
+          el.style.height = '';
+          el.style.margin = '';
+          el.style.pointerEvents = '';
+          el.style.visibility = '';
+        } catch (e) {}
       } catch (e) { /* ignore */ }
     }
 
@@ -2198,6 +3000,7 @@
                 ev.dataTransfer.setData('text/plain', 'lib:'+libId);
                 ev.dataTransfer.effectAllowed = 'move';
                 box.classList.add('dragging-lib');
+                try { createSrcPlaceholder(box); } catch (e) {}
                 // shrink all library cards to make vertical movement easier
                 if (container) container.classList.add('compact-while-dragging');
                 console.log('[dragstart][lib-handle]', { libId });
@@ -2205,11 +3008,20 @@
             });
             libHandle.addEventListener('dragend', () => {
               box.classList.remove('dragging-lib');
+              try { removeSrcPlaceholder(box); } catch (e) {}
               if (container) container.classList.remove('compact-while-dragging');
               window.__currentDrag = null;
               endDrag();
               console.log('[dragend][lib-handle]', { libId });
             });
+            // pointerdown fallback: start a pointer-driven reorder when DnD aborts
+            try {
+              libHandle.style.touchAction = libHandle.style.touchAction || 'none';
+              libHandle.addEventListener('pointerdown', (ev) => {
+                if (ev.button && ev.button !== 0) return;
+                try { beginLibPointerDrag(ev, libId, box, container); } catch (e) { console.error('pointerdown lib handle', e); }
+              });
+            } catch (e) { /* ignore pointer binding failures */ }
         }
         
 
@@ -2247,6 +3059,7 @@
                 // set a visible drag image (use the shelf card element) to keep drag alive
                 try { if (ev.dataTransfer && s) ev.dataTransfer.setDragImage(s, 12, 12); } catch (err) {}
                 s.classList.add('dragging-shelf');
+                try { createSrcPlaceholder(s); } catch (e) {}
                 // minimize shelves list while dragging a shelf to allow moving it past long pages
                 if (shelvesList) shelvesList.classList.add('compact-while-dragging');
                 console.log('[dragstart][shelf-handle] start', { libId, shelfId, x: ev.clientX, y: ev.clientY, time: Date.now() });
@@ -2255,6 +3068,7 @@
             });
             shelfHandle.addEventListener('dragend', (ev) => {
               s.classList.remove('dragging-shelf');
+              try { removeSrcPlaceholder(s); } catch (e) {}
               if (shelvesList) shelvesList.classList.remove('compact-while-dragging');
               console.log('[dragend][shelf-handle] end', { libId, shelfId, x: ev && ev.clientX, y: ev && ev.clientY, time: Date.now() });
               window.__currentDrag = null;
@@ -3054,11 +3868,8 @@
           `;
           const createBtn = document.getElementById('create-from-search');
           if (createBtn) createBtn.addEventListener('click', () => {
-            // open add modal and prefill title with the query
-            const titleEl = document.getElementById('f-title');
-            if (titleEl) titleEl.value = query || '';
-            searchResults.classList.remove('show');
-            modal.classList.add('active');
+            // open add modal with search pane and prefill
+            try { openAddModal(query || '', true); searchResults.classList.remove('show'); } catch (e) { console.error(e); }
           });
           return;
         }
